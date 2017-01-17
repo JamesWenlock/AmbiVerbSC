@@ -1,0 +1,33 @@
+TITLE:: AmbiVerbSC
+summary:: Ambisonic tank reverb with coupling
+
+DESCRIPTION::
+An ambisonic tank reverb with coupling
+
+CLASSMETHODS::
+
+METHOD:: ar
+
+argument::sig
+
+argument::mix
+
+argument::decay
+
+argument::preDelay
+
+argument::modAmt
+
+argument::modRate
+
+argument::crossoverFreq
+
+argument::lowRT
+
+argument::highRT
+
+returns::
+An UGen.
+
+EXAMPLES::
+
