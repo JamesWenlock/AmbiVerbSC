@@ -1,0 +1,10 @@
+(
+	name: 		"AmbiVerbSC",
+	summary:	"Ambisonic tank reverb",
+    schelp:     "AmbiVerbSC",
+	author: 	"James Wenlock",
+  	license: 	"GPL",
+	version:	"1.0.0",
+	organization: "Center for Digital Arts and Experimental Media",
+    copyright: "James Wenlock, 2017"
+)
