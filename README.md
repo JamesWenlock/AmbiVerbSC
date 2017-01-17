@@ -22,12 +22,12 @@ AmbiVerbSC can be installed using the Quarks gui in supercollier.
 
 ## Resources 
 
-*Anderson, Joseph, and Sean Costello. "Adapting artificial reverberation architectures for B-format signal processing." In Proc. of the Int. Ambisonics Symposium, Graz, Austria. 2009. 
-*Dattorro, Jon. "Effect design, part 1: Reverberator and other filters." Journal of the Audio Engineering Society 45, no. 9 (1997): 660-684. 
-*Dodge, Charles, and Thomas A. Jerse. Computer music: synthesis, composition and performance. Macmillan Library Reference, 1997. 
-*Lopez-Lezcano, Fernando. "An Architecture for Reverberation in High Order Ambisonics." In Audio Engineering Society Convention 137. Audio Engineering Society, 2014. 
-*Schroeder, Manfred R., and Benjamin F. Logan. "" Colorless" artificial reverberation." IRE Transactions on Audio 6 (1961): 209-214. 
-*Wiggins, Bruce, and Mark Dring. "AmbiFreeVerb 2—Development of a 3D Ambisonic Reverb with Spatial Warping and Variable Scattering." In Audio Engineering Society Conference: 2016 AES International Conference on Sound Field Control. Audio Engineering Society, 2016.
+* Anderson, Joseph, and Sean Costello. "Adapting artificial reverberation architectures for B-format signal processing." In Proc. of the Int. Ambisonics Symposium, Graz, Austria. 2009. 
+* Dattorro, Jon. "Effect design, part 1: Reverberator and other filters." Journal of the Audio Engineering Society 45, no. 9 (1997): 660-684. 
+* Dodge, Charles, and Thomas A. Jerse. Computer music: synthesis, composition and performance. Macmillan Library Reference, 1997. 
+* Lopez-Lezcano, Fernando. "An Architecture for Reverberation in High Order Ambisonics." In Audio Engineering Society Convention 137. Audio Engineering Society, 2014. 
+* Schroeder, Manfred R., and Benjamin F. Logan. "" Colorless" artificial reverberation." IRE Transactions on Audio 6 (1961): 209-214. 
+* Wiggins, Bruce, and Mark Dring. "AmbiFreeVerb 2—Development of a 3D Ambisonic Reverb with Spatial Warping and Variable Scattering." In Audio Engineering Society Conference: 2016 AES International Conference on Sound Field Control. Audio Engineering Society, 2016.
 
 ## Author
 
