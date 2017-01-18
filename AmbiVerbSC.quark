@@ -1,7 +1,7 @@
 (
 	name: 		"AmbiVerbSC",
 	summary:	"Ambisonic tank reverb",
-    	schelp:     "AmbiVerbSC",
+    	schelp:     	"AmbiVerbSC",
 	author: 	"James Wenlock",
   	license: 	"GPL",
 	version:	"0.1.0",
