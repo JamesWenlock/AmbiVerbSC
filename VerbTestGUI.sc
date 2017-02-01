@@ -15,8 +15,8 @@ VerbTestGUI {
 		bpm = 20;
 		busGroup = Group.new(server, \addToTail);
 		monoBus = Bus.audio(server, 1);
-		stereoBus = Bus.audio(server, 2);
-		bFormatBus = Bus.audio(server, 4);
+		stereoBus = Bus.audio(server, 1);
+		bFormatBus = Bus.audio(server, 1);
 		bus = monoBus;
 		this.makeGUI;
 		this.initSynths;
@@ -260,9 +260,10 @@ VerbTestGUI {
 			{
 				var sig;
 				sig = In.ar(monoBus, 1);
+				sig = FoaEncode.ar(sig, FoaEncoderMatrix.newOmni);
 				sig = AmbiVerbSC.ar(sig);
-
-				Out.ar(0, Pan2.ar(sig));
+				sig = FoaDecode.ar(sig, FoaDecoderMatrix.newStereo);
+				Out.ar(0, Balance2.ar(sig[0], sig[1]));
 			}
 		).add;
 
@@ -280,9 +281,10 @@ VerbTestGUI {
 			{
 				var sig;
 				sig = In.ar(bFormatBus, 1);
-				sig = sig!4;
+				sig = FoaEncode.ar(sig, FoaEncoderMatrix.newOmni);
 				sig = AmbiVerbSC.ar(sig);
-				Out.ar(0, sig);
+				sig = FoaDecode.ar(sig, FoaDecoderMatrix.newStereo);
+				Out.ar(0, Balance2.ar(sig[0], sig[1]));
 			}
 		).add;
 	}
@@ -302,6 +304,7 @@ VerbTestGUI {
 
 	start {
 		"start".postln;
+		curSource.postln;
 		Pdef(\sequence).play;
 	}
 
