@@ -1,5 +1,5 @@
 AmbiVerbSC {
-	*ar {arg in, mix = 0.5, preDelay = 0, crossoverFreq = 700, lowRT = 6, highRT = 1, spatRate = 0.2, spatAmt = 1, tFeedback = 1, tModRate = 0.21, tModAmt = 1;
+	*ar {arg in, mix = 1, preDelay = 0, crossoverFreq = 3000, lowRT = 10, highRT = 7, dispersion = 1, size = 7, modWidth = 0.2, modRate = 0.3, coupRate = 0.5, coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi, phaseRotMix  = 0;
 		var dry, wet, out;
 		var allPassData;
 		var modVals;
@@ -15,34 +15,25 @@ AmbiVerbSC {
 		var theseModes, sizeRange;
 		var coupRates;
 		var newLFMod, hilbert, hilbertAmt;
-/*		var spatRate, spatAmt;
-		var tFeedback, tModAmt, tModRate;*/
-		// spatialDispersion = [rate, amount]
-		// timeDispersion =    [feedback, modRate, modAmt]
-/*		spatRate  = spatialDispersion[0];
-		spatAmt   = spatialDispersion[1];
-		tFeedback = timeDispersion[0];
-		tModAmt   = timeDispersion[1];
-		tModRate  = timeDispersion[2];*/
-
-		coupRates = [3.214, 3.317, 3.119] * spatRate;
+		var width;
 
 		sizeRange = [0.2, 0.7];
 
 
-		theseModes = {RoomModes.new({rrand(sizeRange[0], sizeRange[1]) + 7}!3).returnRandVals(8)}!4;
+		theseModes = {RoomModes.new({rrand(sizeRange[0], sizeRange[1]) + size}!3).returnRandVals(8)}!4;
 		theseModes = theseModes.flop;
 
 		g = 2 / (1 + sqrt(5));
-		dTs = theseModes.reverse;
-		decTs = -3 * dTs / (log10(g * tFeedback));
+		dTs = theseModes;
+		decTs = -3 * dTs / (log10(g * dispersion));
 		dTs.flop.do({arg theseDts;
 		   delaySum = delaySum.add(theseDts.sum);
 		});
 
-		lowG  = 10**(-3 * (delaySum + dTs[7]) / lowRT);
-		highG = 10**(-3 * (delaySum + dTs[7]) / highRT);
-
+		lowG  = 10**(-3 * (delaySum + dTs[0]) / lowRT);
+		highG = 10**(-3 * (delaySum + dTs[0]) / highRT);
+		width =  dTs[7] * modWidth;
+		maxDelay = dTs[7] + width;
 		modVals = [
 			[0.016, 0.012, 0.08, 0.05, 0.03, 0.07, 0.074, 0.061] / 4,
 			[0.03, 0.09, 0.04, 0.02, 0.06, 0.05, 0.092, 0.0432] / 4
@@ -74,13 +65,13 @@ AmbiVerbSC {
 
 		sum = LocalIn.ar(4) + DelayL.ar(dry, preDelay, preDelay);
 		allPassData.do({arg thisData;
-			sum = AllpassL.ar(sum, thisData[0] * 2,
-				thisData[0] + LFNoise2.kr(thisData[1] * tModRate, thisData[0] * thisData[2] * tModAmt),
+			sum = AllpassL.ar(sum, maxDelay,
+				thisData[0] + LFNoise2.kr(modRate, width),
 				thisData[3]);
 		});
 
 
-		wet = DelayL.ar(sum, dTs[7] - ControlRate.ir.reciprocal, dTs[7] - ControlRate.ir.reciprocal);
+		wet = DelayL.ar(sum, dTs[0] - ControlRate.ir.reciprocal, dTs[0] - ControlRate.ir.reciprocal);
 
 		low = LPF.ar(wet, crossoverFreq);
 		high = low * -1 + wet;
@@ -91,18 +82,18 @@ AmbiVerbSC {
 		wet = low + high;
 
 		// phase rotation
-		newLFMod = LFNoise2.kr([{rrand(0.2, 0.6)} * spatRate]!4, 2pi);  // does expand!!
+		newLFMod = LFNoise2.kr({phaseRotRate + rrand(0.003,0.0214)}!4, phaseRotAmt);  // does expand!!
 		hilbert = wet;
 		// better... more SC
 		hilbert.collectInPlace({arg item, i;
 			item = (Hilbert.ar(item) * [newLFMod[i].cos, newLFMod[i].sin]).sum;
 		});
-		wet = (wet * cos(spatAmt * pi/2)) + (hilbert * sin(spatAmt * pi/2));
+		wet = (wet * cos(phaseRotMix * pi/2)) + (hilbert * sin(phaseRotMix * pi/2));
 
 		wet = FoaEncode.ar(wet, FoaEncoderMatrix.newAtoB);
 
-		spatAmt = spatAmt * 2pi;
-		wet = FoaRTT.ar(wet, LFNoise2.kr(coupRates[0], spatAmt), LFNoise2.kr(coupRates[1], spatAmt), LFNoise2.kr(coupRates[2], spatAmt));
+		coupRates = {coupRate + rrand(0.003,0.0214)}!3;
+		wet = FoaRTT.ar(wet, LFNoise2.kr(coupRates[0], coupAmt), LFNoise2.kr(coupRates[1], coupAmt), LFNoise2.kr(coupRates[2], coupAmt));
 
 		wet = FoaDecode.ar(wet, FoaDecoderMatrix.newBtoA);
 
@@ -110,8 +101,8 @@ AmbiVerbSC {
 		wet = DelayL.ar(wet, ControlRate.ir.reciprocal, ControlRate.ir.reciprocal);
 
 		cascade.do({arg thisData;
-			wet = AllpassL.ar(wet, thisData[0] + thisData[2],
-				thisData[0] + LFNoise2.kr(thisData[1], thisData[0] * thisData[2]),
+			wet = AllpassL.ar(wet, maxDelay,
+				thisData[0] + LFNoise2.kr(modRate, width),
 				thisData[3]);
 		});
 
