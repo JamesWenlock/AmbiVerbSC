@@ -31,6 +31,11 @@ VerbTestV3 {
 		monoSynth = Synth.new(\bFormat, [\mix, params[0], \preDelay, params[1], \crossoverFreq, params[2], \lowRT, params[3], \highRT, params[4], \dispersion, params[5], \size, params[6], \modWidth, params[7], \modRate, params[8], \coupRate, params[9], \coupAmt, params[10], \phaseRotRate, params[11], \phaseRotAmt, params[12], \phaseRotMix, params[13]], target: busGroup);
 	}
 
+	setGroup {
+		monoSynth.set(\mix, params[0], \preDelay, params[1], \crossoverFreq, params[2], \lowRT, params[3], \highRT, params[4], \dispersion, params[5], \size, params[6], \modWidth, params[7], \modRate, params[8], \coupRate, params[9], \coupAmt, params[10], \phaseRotRate, params[11], \phaseRotAmt, params[12], \phaseRotMix, params[13]);
+	}
+
+
 	makeGUI {
 		var view, popUp;
 		var guiFont;
@@ -47,7 +52,7 @@ VerbTestV3 {
 
 		createWindow = {
 			gui = Window.new("verbTest", Rect.new(900, 500, 630, 300), false)
-			.background_(Color.green.alpha_(0.2)).alwaysOnTop_(true).front;
+			.background_(Color.black).alwaysOnTop_(true).front.onClose_({server.freeAll});
 			view = CompositeView(gui, Rect.new(25, 25, 580, 250))
 			.background_(Color.black);
 			view.decorator_(FlowLayout(view.bounds, 20@20, 10@10));
@@ -72,19 +77,6 @@ VerbTestV3 {
 		makeSource = {
 			types = CompositeView(view, 120@500).background_(Color.black);
 			types.decorator_(FlowLayout(types.bounds, 0@0, 20@10));
-
-			typeStrings = ["SoundFile"];
-			sounds = Dictionary.new;
-			typeStrings.do({arg string;
-				sounds.put(string.asSymbol,
-					Button(types, 120@33).states_([
-						[string, Color.green, Color.black],
-						[string, Color.black, Color.green]])
-					.font_(guiFont.pixelSize_(20))
-				)
-			});
-
-			sounds[\SoundFile].value_(1);
 			buttons[\play].value_(0);
 			popUp = PopUpMenu(types, 120@25).items_(bufNames)
 			.font_(guiFont.pixelSize_(12))
@@ -101,27 +93,6 @@ VerbTestV3 {
 
 		buffer = buffers[bufNames[0].asSymbol];
 
-		addSourceBehavior = {
-			sounds.keysDo({arg key;
-				sounds[key].action_({arg button;
-					if (button.value == 1,
-						{
-							buttons[\play].valueAction_(0);
-							sounds.values.do(
-								{arg thisButton; thisButton.value_(0)});
-							button.value_(1);
-							curSource = key;
-							this.initSynths;
-						},
-						{
-							buttons[\play].valueAction_(0);
-							button.value_(1);
-						}
-					)
-				})
-			});
-		};
-
 		createParams = {arg name, data, rect, backCol = Color.clear;
 			var outView, paramData, text;
 			outView = CompositeView(gui, rect)
@@ -131,12 +102,10 @@ VerbTestV3 {
 			.stringColor_(Color.green).align_(\center).background_(Color.black.alpha_(0.5));
 			text = StaticText(outView, 90@25).string_(data[0][1]).font_(guiFont.pixelSize_(17))
 .stringColor_(Color.green).align_(\center);
-			this.initSynths;
-			this.initGroup;
 			data.do({arg thisData, i;
 				var knobVal;
 				StaticText(outView, 40@25).string_(thisData[0].asString)
-				.font_(guiFont.pixelSize_(3))
+				.font_(guiFont.pixelSize_(15))
 				.stringColor_(Color.green);
 				Knob(outView, 40@25).color_([Color.black, Color.green, Color.green, Color.green])
 				.action_({arg thisKnob;
@@ -146,6 +115,7 @@ VerbTestV3 {
 					);
 					text.string_(knobVal).asString;
 					params[thisData[3]] = knobVal;
+				    this.setGroup;
 					params.postln;
 				}).valueAction_(
 				if (thisData[4] == True,
@@ -163,7 +133,9 @@ VerbTestV3 {
 		makeEndButton.value();
 		makeSource.value();
 		addSourceBehavior.value();
-		createParams.value(
+		this.initSynths;
+//		this.initGroup;
+/*	createParams.value(
 			"Control",
 			[
 				[\mix, 0.5, [0, 1], 0, True],
@@ -187,6 +159,7 @@ VerbTestV3 {
 			Rect.new(390, 78, 200, 175),
 			Color.green.alpha_(0.2)
 		);
+		*/
 		popUp.action_({arg obj;
 			buttons[\play].valueAction_(0);
 			obj.item.postln;
@@ -206,12 +179,13 @@ VerbTestV3 {
 			}
 		).add;
 
-
+		"TEST".postln;
+		params.postln;
 		SynthDef.new(\bFormat,
-			{arg mix, preDelay = 0, crossoverFreq = 3000, lowRT = 3, highRT = 0.05, sDR, sDA, tDF, tDR, tDA;
+			{arg mix, preDelay = 0, crossoverFreq = 3000, lowRT = 3, highRT = 0.05, dispersion = 1, size = 7, modWidth = 0.2, modRate =  0.2, coupRate= 0.2, coupAmt = 2pi, phaseRotRate = 0.23, phaseRotAmt = 2pi, phaseRotMix = 1;
 				var sig;
 				sig = In.ar(bus, 4);
-				sig = AmbiVerbSC.ar(sig);
+				sig = AmbiVerbSC.ar(sig, mix, preDelay, crossoverFreq, lowRT, highRT, dispersion, size, modWidth, modRate, coupRate, coupAmt, phaseRotRate, phaseRotAmt, phaseRotMix);
 				Out.ar(0, sig);
 			}
 		).add;
@@ -220,7 +194,7 @@ VerbTestV3 {
 
 
 	start {
-		soundPlay = Synth(\SoundFile, [\buffer, buffer]);
+		soundPlay = Synth(\SoundFile, [\buffer, buffer, ]);
 		NodeWatcher.register(soundPlay);
 	}
 
@@ -231,9 +205,5 @@ VerbTestV3 {
 			"Stop".postln;
 			soundPlay.free;
 		});
-	}
-
-	end {
-		gui.close;
 	}
 }
