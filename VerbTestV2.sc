@@ -2,7 +2,7 @@ VerbTestV2 {
 	var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server, timeSig, bpm;
 	var bus, monoBus, stereoBus, bFormatBus, synthGroup, busGroup;
 	var params, monoSynth;
-	var paramBox;
+	var paramBox, soundPlay;
 
 
 	*new {arg server;
@@ -11,6 +11,8 @@ VerbTestV2 {
 
 	init {arg thisServer;
 		server = thisServer;
+		server.options.numOutputBusChannels = 4;
+		server.waitForBoot({
 		bufNames = [];
 		buffers  = Dictionary.new;
 		curSource = "Pink Noise".asSymbol;
@@ -22,6 +24,7 @@ VerbTestV2 {
 		bFormatBus = Bus.audio(server, 1);
 		bus = monoBus;
 		this.makeGUI;
+		})
 	}
 
 	initGroup {
@@ -307,6 +310,7 @@ VerbTestV2 {
 		SynthDef.new("Pink Noise".asSymbol,
 			{arg amp = 0.8, out = 0, da = 2;
 				var sig;
+
 				sig = PinkNoise.ar(Line.ar(amp, 0, 0.05, doneAction: da));
 
 				Out.ar(bus, sig);
@@ -316,7 +320,7 @@ VerbTestV2 {
 		SynthDef.new("SoundFile".asSymbol,
 			{arg amp = 0.8, out = 0, da = 2;
 				var sig;
-				sig = PlayBuf.ar(1, buffer, doneAction:da);
+				sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer), doneAction:da);
 
 				Out.ar(bus, sig);
 			}
@@ -326,11 +330,10 @@ VerbTestV2 {
 		SynthDef.new(\mono,
 			{arg mix, preDelay = 0, crossoverFreq = 3000, lowRT = 3, highRT = 0.05, sDR, sDA, tDF, tDR, tDA;
 				var sig;
-				sig = In.ar(monoBus, 1);
-				sig = FoaEncode.ar(sig, FoaEncoderMatrix.newOmni);
-				sig = AmbiVerbSC.ar(sig, mix, 1, crossoverFreq, lowRT, highRT, sDR, sDA, tDF, tDR, tDA);
-				sig = FoaDecode.ar(sig, FoaDecoderMatrix.newStereo);
-				Out.ar(0, Balance2.ar(sig[0], sig[1]));
+				sig = In.ar(monoBus, 4);
+//				sig = AmbiVerbSC.ar(sig, mix, 1, crossoverFreq, lowRT, highRT, sDR, sDA, tDF, tDR, tDA);
+				sig = AmbiVerbSC.ar(sig);
+				Out.ar(0, sig);
 			}
 		).add;
 
@@ -340,7 +343,7 @@ VerbTestV2 {
 				sig = In.ar(stereoBus, 1);
 				sig = sig!2;
 				sig = AmbiVerbSC.ar(sig);
-				Out.ar(0, Balance2.ar(sig[0], sig[1]));
+				Out.ar(0, sig);
 			}
 		).add;
 
@@ -349,9 +352,7 @@ VerbTestV2 {
 				var sig;
 				sig = In.ar(bFormatBus, 1);
 				sig = FoaEncode.ar(sig, FoaEncoderMatrix.newOmni);
-				sig = AmbiVerbSC.ar(sig);
-				sig = FoaDecode.ar(sig, FoaDecoderMatrix.newStereo);
-				Out.ar(0, Balance2.ar(sig[0], sig[1]));
+				Out.ar(0, sig);
 			}
 		).add;
 	}
@@ -361,7 +362,6 @@ VerbTestV2 {
 			{
 				var sig;
 				sig = In.ar(bFormatBus, 1);
-				sig = FoaEncode.ar(sig, FoaEncoderMatrix.newOmni);
 				sig = AmbiVerbSC.ar(sig);
 				sig = FoaDecode.ar(sig, FoaDecoderMatrix.newStereo);
 				Out.ar(0, Balance2.ar(sig[0], sig[1]));
@@ -385,12 +385,22 @@ VerbTestV2 {
 	start {
 		"start".postln;
 		curSource.postln;
+		(curSource == 'SoundFile').if({
+			soundPlay = Synth(curSource)
+		}, {
 		Pdef(\sequence).play;
+
+
+		});
 	}
 
 	stop {
 		"stop".postln;
+		((curSource == 'SoundFile') and: (soundPlay.isPlaying)).if({
+			soundPlay.free;
+		}, {
 		Pdef(\sequence).stop;
+		});
 	}
 
 	end {
