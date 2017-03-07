@@ -7,19 +7,17 @@ RoomModes {
 
 	init {arg thisI;
 		i = thisI;
+		i.postln;
 		c = 388;
 		dTs = Array.new;
 		nVals = Array.fill(3, {arg i; i})!3;
-		nVals.postln;
 		this.getModeVals(nVals);
 		dTs = dTs.asSet.asArray.sort;
 		dTs = 1/dTs;
-		dTs.postln;
-		dTs.size.postln;
+
 	}
 
 	getModeVals {arg n;
-		n.postln;
 		if (n[0].size != 0 && n[1].size != 0 && n[2].size != 0,
 			{
 				var thisN;
