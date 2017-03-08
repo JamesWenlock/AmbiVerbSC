@@ -12,13 +12,46 @@ image:: tankdiagram.png::
 
 section:: Tank Reverb Architecture
 
-The Tank Reverb Architecture consists of an allpass cascade inside of a feedback loop. Through every loop iteration, the signal is delayed and multiplied by a scaler value. The output consists of the summation of these passes sent through another allpass cascade. This section will go over the individual elements of this structure
+The Tank Reverb Architecture consists of an allpass cascade inside of a feedback loop. Through every loop iteration, the signal is delayed and multiplied by a scaler value. The output consists of the summation of these passes sent through another allpass cascade. This section will go over the individual elements of this structure.
 
 image:: monotank.png::
 
 subsection:: AllPass Cascades
 
-The AllPass cascade creates early reflections. The delay times are calculated using a recurssive algorithm in conjunction with the RoomModes equation found in DAFX.
+The AllPass cascade creates early reflections. AllPasses were chosen instead of comb filters because their frequency response stays consistent. This creates less color as the signal is passed through the chain.
+
+ link::Classes/FoaEncoderMatrix#newAtoB#Here's my text::
+
+The AllPass filter needs 4 arguments to function:
+
+-max delay time
+
+-delay time
+
+-decay time
+
+decay = -3 * delay / (log10(g * dispersion));
+
+g = 10**(-3 * (delaySum + dTs[0]) / highRT);
+
+
+The delay times are calculated using a recurssive algorithm in conjunction with the RoomModes equation found in DAFX.
+
+- Uses cubic dimensions.
+
+- Calculates room modes from these dimensions
+
+- Sorts and returns 8 largest delay time from these modes
+
+- The following equation is used to calculate the rest of the arguments inside of the allpass.
+
+
+With
+
+
+With these delay times calculated,Decay times are  using the following formula for each delay time
+
+
 
 image:: allpass chain.png::
 
@@ -32,7 +65,7 @@ subsection:: Shelf Filter
 
 image:: shelf.png::
 
-section:: Conversion to Ambisonic
+section:: Ambisonic Implementation
 
 subsection:: Conversion From B to A
 
