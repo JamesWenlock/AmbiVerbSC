@@ -12,21 +12,27 @@ image:: tankdiagram.png::
 
 section:: Tank Reverb Architecture
 
+The Tank Reverb Architecture consists of an allpass cascade inside of a feedback loop. Through every loop iteration, the signal is delayed and multiplied by a scaler value. The output consists of the summation of these passes sent through another allpass cascade. This section will go over the individual elements of this structure
+
 image:: monotank.png::
 
 subsection:: AllPass Cascades
+
+The AllPass cascade creates early reflections. The delay times are calculated using a recurssive algorithm in conjunction with the RoomModes equation found in DAFX.
 
 image:: allpass chain.png::
 
 image:: allpass reverberator.png::
 
-subsection:: Delay
+subsection:: Feedback Delay
+
+The feedback delay scatters these reflections over time.
 
 subsection:: Shelf Filter
 
 image:: shelf.png::
 
-section:: Ambisonic Implementation
+section:: Conversion to Ambisonic
 
 subsection:: Conversion From B to A
 
