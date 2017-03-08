@@ -49,8 +49,18 @@ VerbTestV3 {
 		var bufPath;
 		var controls;
 		var makeTitle;
+		var titleFont;
 
-		guiFont = Font("8514oem").pixelSize_(50);
+		if (Font.availableFonts[0] == "AR BERKLEY",
+			{
+				titleFont = Font("AR BERKLEY", 70, True);
+				guiFont = Font("8514oem").pixelSize_(50);
+			},
+			{
+				titleFont = Font("Brush Script MT", 70, True);
+				guiFont = Font("Courier new").pixelSize_(50);
+			}
+		);
 		buttons = Dictionary.new;
 
 		createWindow = {
@@ -155,7 +165,7 @@ VerbTestV3 {
 
 		makeTitle = {
 			var titleView = CompositeView(gui, Rect.new(395 + 100, 35, 600 - 100, 80)).background_(Color.green.alpha_(0.5));
-			StaticText(titleView, Rect(0, 0, 600 - 100, 80)).background_(Color.black.alpha_(0.8)).string_("AmbiVerbSC").font_(Font("AR BERKLEY", 70, True)).stringColor_(Color.green).align_(\center);
+			StaticText(titleView, Rect(0, 0, 600 - 100, 80)).background_(Color.black.alpha_(0.8)).string_("AmbiVerbSC").font_(titleFont).stringColor_(Color.green).align_(\center);
 		};
 
 		createWindow.value();
@@ -249,7 +259,7 @@ VerbTestV3 {
 				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), phaseRotMix.lag(0.5), spread.lag(0.5));
 				sig = sig * amp.lag(0.5);
 				sig = Limiter.ar(sig);
-				Out.ar(0, 0);
+				Out.ar(0, sig);
 			}
 		).add;
 	}
