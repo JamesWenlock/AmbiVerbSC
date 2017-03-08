@@ -3,26 +3,40 @@ summary:: A detailed explanation of AmbiVerbSC's inner workings
 
 section:: Overview
 
+
 Ambisonics is an audio technique that allows for precise production, manipulation, and playback of full sphere surround sound. For the most part this method has been limited to academic circles, but recent advances in computing, software, and Virtual Reality (VR) have made Ambisonics more accessible and applicable than ever before. Although these developments are exciting, the amount effects designed for this audio methodology is minuscule in comparison to traditional audio environments.
 
 The purpose of AmbiVerbSC is to explore the Ambisonic implementation of traditional digital audio effects by creating an Ambisonic reverberator. To clarify, a reverberator is a structure that uses echoes to simulate the reflections of a 3D space. The algorithm (figure 1) is comprised of a delay-line cascade that is fed back into itself forming a feedback loop. Inside this loop, the summation of these delays is transformed in space over time to create a rich three dimensional spatial image. This tutorial will cover the implementation and creative applications of this structure.
 
+image:: tankdiagram.png::
 
-emphasis:: figure 1
-image::
+section:: Tank Reverb Architecture
 
+image:: monotank.png::
 
-Section
+subsection:: AllPass Cascades
 
-section:: Converting from B to A
+image:: allpass chain.png::
 
-section:: The Tank
+image:: allpass reverberator.png::
 
-section:: Feedback
+subsection:: Delay
 
-section:: Coupling
+subsection:: Shelf Filter
 
-section:: Going back to B
+image:: shelf.png::
+
+section:: Ambisonic Implementation
+
+subsection:: Conversion From B to A
+
+subsection:: Phase Rotation
+
+subsection:: Coupling
+
+section:: AmbiVerbGUI
+
+image:: ambiverbgui.png::
 
 section:: Conclusion
 
