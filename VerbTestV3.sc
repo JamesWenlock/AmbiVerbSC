@@ -14,7 +14,7 @@ VerbTestV3 {
 
 	init {arg thisServer;
 		server = thisServer;
-		server.options.memSize_(2**20);
+		server.options.memSize_(2**22);
 		server.options.numOutputBusChannels = 4;
 		server.boot;
 		server.waitForBoot({
@@ -175,7 +175,7 @@ VerbTestV3 {
 		makeSource.value();
 		addSourceBehavior.value();
 		makeTitle.value();
-    	this.initSynths;
+    		this.initSynths;
 
 	createParams.value(
 			"Control",
@@ -237,6 +237,22 @@ VerbTestV3 {
 			amp = obj.value(0, 1, 0, 2);
 			soundPlay.set(\amp, amp);
 		}).valueAction_(0.5);
+		
+		buttons.put(\rotMix,
+				Button(gui, Rect.new(522, 250, 35, 28)).states_([
+					["On", Color.green, Color.black],
+					["Off", Color.green, Color.black]])
+				.font_(guiFont.pixelSize_(15))
+			);
+			buttons[\rotMix].action_({arg button;
+				button.value.postln;
+				if (button.value == 0,
+				{soundPlay.set(\phaseRotMix, 0)},
+				{soundPlay.set(\phaseRotMix, 1)}
+				);
+				curSource.postln;
+				this.initSynths;
+			});
 	}
 
 
