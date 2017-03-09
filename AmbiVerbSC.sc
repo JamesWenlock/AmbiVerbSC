@@ -1,6 +1,6 @@
 AmbiVerbSC {
 
-	*ar {arg in, mix = 1, preDelay = 0, crossoverFreq = 3000, lowRT = 10, highRT = 7, dispersion = 1, size = 7, timeModWidth = 0.2, timeModRate = 0.3, coupRate = 0.5, coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi, phaseRotMix  = 0, maxPreDelay = 1, feedbackSpread = 1;
+	*ar {arg in, mix = 1, preDelay = 0, crossoverFreq = 3000, lowRT = 10, highRT = 7, dispersion = 1, size = 7, timeModWidth = 0.2, timeModRate = 0.3, coupRate = 0.5, coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi, orientation  = \flu, maxPreDelay = 1, feedbackSpread = 1;
 		var dry, wet, out;
 		var allPassData;
 		var modVals;
@@ -34,9 +34,12 @@ AmbiVerbSC {
 		   delaySum = delaySum.add(theseDts.sum);
 		});
 
-		lowG  = 10**(-3 * (delaySum + dTs[0]) / lowRT);
-		highG = 10**(-3 * (delaySum + dTs[0]) / highRT);
-		width =  dTs[7] * timeModWidth.linlin(0, 1, 0, 0.5);
+		maxFeedbackDelay = delaySum + dTs[0] - ControlRate.ir.reciprocal;
+		feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, 0.5, 1);
+
+		lowG  = 10**(-3 * (feedbackDelay) / lowRT);
+		highG = 10**(-3 * (feedbackDelay) / highRT);
+		width =  dTs[7] * timeModWidth.linlin(0, 1, 0, 0.1);
 		maxDelay = dTs[7] + width;
 
 		hPFreq = 20;
@@ -66,7 +69,7 @@ AmbiVerbSC {
 			[dTs[5], modVals[0][5], modVals[1][5], decTs[5]],
 		];
 
-		in = FoaDecode.ar(in, FoaDecoderMatrix.newBtoA);
+		in = FoaDecode.ar(in, FoaDecoderMatrix.newBtoA(orientation));
 
 		dry = in;
 
@@ -77,9 +80,6 @@ AmbiVerbSC {
 				thisData[0] + LFNoise2.kr(timeModRate, width),
 				thisData[3]);
 		});
-
-		maxFeedbackDelay = delaySum + dTs[0] - ControlRate.ir.reciprocal;
-		feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, 0.5, 1);
 
 		wet = DelayL.ar(sum, maxFeedbackDelay, feedbackDelay);
 
