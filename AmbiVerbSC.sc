@@ -35,7 +35,7 @@ AmbiVerbSC {
 		});
 
 		maxFeedbackDelay = delaySum + dTs[0] - ControlRate.ir.reciprocal;
-		feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, 0.5, 1);
+		feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, 0.1, 1);
 
 		lowG  = 10**(-3 * (feedbackDelay) / lowRT);
 		highG = 10**(-3 * (feedbackDelay) / highRT);
