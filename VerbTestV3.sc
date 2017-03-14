@@ -28,10 +28,6 @@ VerbTestV3 {
 			this.makeGUI;
 		})
 	}
-	/*
-	initGroup {
-	monoSynth = Synth.new(\bFormat, [\mix, params[0], \preDelay, params[1], \crossoverFreq, params[2], \lowRT, params[3], \highRT, params[4], \dispersion, params[5], \size, params[6], \modWidth, params[7], \modRate, params[8], \coupRate, params[9], \coupAmt, params[10], \phaseRotRate, params[11], \phaseRotAmt, params[12], \phaseRotMix, params[13]], addAction: \addToTail);
-	}*/
 
 	setSynth {
 		(soundPlay.isPlaying).if({
@@ -201,11 +197,11 @@ VerbTestV3 {
 		createParams.value(
 			"Time Diffusion",
 			[
+				[\size, 0, [0, 1], 15, True],
 				[\dispersion, 1, [0, 1], 5, True],
 				[\spread, 1, [0, 1], 14, True],
 				[\modWidth, 0.2, [0, 1], 7, True],
-				[\modRate,0.221, [0, 10], 8, True],
-				[\size, 0, [0, 1], 15, True]
+				[\modRate,0.221, [0, 10], 8, True]
 			],
 			//Rect.new(390, 48, 200, 125),
 			Rect.new(45 + (320 * 2), 125, 310, 175),
@@ -231,7 +227,7 @@ VerbTestV3 {
 			this.initSynths;
 		});
 
-		TextField(gui, Rect.new(842, 250, 35, 28)).align_(\center).font_(guiFont.pixelSize_(15)).stringColor_(Color.green).background_(Color.black).value_(7).action_({arg text;
+		TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSize_(15)).stringColor_(Color.green).background_(Color.black).value_(7).action_({arg text;
 			//			text.postln;
 			size = text.value.asInteger.round(1);
 			//			size.postln;
@@ -275,7 +271,7 @@ VerbTestV3 {
 				var sig;
 				orient.postln;
 				sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer), loop: 1);
-				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), orient, spread.lag(0.5));
+				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), orient, 10,spread.lag(0.5));
 				sig = sig * amp.lag(0.5);
 				sig = Limiter.ar(sig);
 				Out.ar(0, amp * FoaDecode.ar(sig, FoaDecoderMatrix.newStereo));
@@ -287,7 +283,7 @@ VerbTestV3 {
 				var sig;
 				orient.postln;
 				sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer), loop: 1);
-				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), orient, spread.lag(0.5));
+				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), orient, 10,spread.lag(0.5));
 				sig = sig * amp.lag(0.5);
 				sig = Limiter.ar(sig);
 				Out.ar(0, sig);
@@ -310,5 +306,8 @@ VerbTestV3 {
 		});
 	}
 }
+
+
+
 
 	
