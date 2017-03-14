@@ -1,6 +1,6 @@
 AmbiVerbSC {
 
-	*ar {arg in, mix = 1, preDelay = 0, crossoverFreq = 3000, lowRT = 10, highRT = 7, dispersion = 1, size = 7, timeModWidth = 0.2, timeModRate = 0.3, coupRate = 0.5, coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi, orientation  = \flu, maxPreDelay = 1, feedbackSpread = 1;
+	*ar {arg in, mix = 1, preDelay = 0, crossoverFreq = 3000, lowRT = 10, highRT = 7, dispersion = 1, size = 7, timeModWidth = 0.2, timeModRate = 0.3, coupRate = 0.5, coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi, orientation  = \flu, maxPreDelay = 10, feedbackSpread = 1;
 		var dry, wet, out;
 		var allPassData;
 		var modVals;
@@ -21,8 +21,6 @@ AmbiVerbSC {
 		var modes;
 		var hPFreq;
 
-		maxPreDelay = 10;
-
 		sizeRange = [0.2, 0.7];
 		theseModes = {RoomModes.new({rrand(sizeRange[0], sizeRange[1]) + size}!3).returnRandVals(8)}!4;
 		theseModes = theseModes.flop;
@@ -35,7 +33,7 @@ AmbiVerbSC {
 		});
 
 		maxFeedbackDelay = delaySum + dTs[0] - ControlRate.ir.reciprocal;
-		feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, 0.1, 1);
+		feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, 0.5, 1);
 
 		lowG  = 10**(-3 * (feedbackDelay) / lowRT);
 		highG = 10**(-3 * (feedbackDelay) / highRT);
@@ -94,15 +92,6 @@ AmbiVerbSC {
 
 		wet = low + high;
 
-		// phase rotation
-		// newLFMod = LFNoise2.kr({phaseRotRate + rrand(0.003,0.0214)}!4, phaseRotAmt);  // does expand!!
-		// hilbert = wet;
-		// // better... more SC
-		// hilbert.collectInPlace({arg item, i;
-		// 	item = (Hilbert.ar(item) * [newLFMod[i].cos, newLFMod[i].sin]).sum;
-		// });
-		// wet = (wet * cos(phaseRotMix * pi/2)) + (hilbert * sin(phaseRotMix * pi/2));
-
 		// JA's version of phase rotation
 		newLFMod = LFNoise2.kr({phaseRotRate + rrand(0.003,0.0214)}!4, phaseRotAmt);  // does expand!!
 		hilbert = wet;
@@ -111,7 +100,6 @@ AmbiVerbSC {
 			item = (Hilbert.ar(item) * [newLFMod[i].cos, newLFMod[i].sin]).sum;
 		});
 		wet = hilbert;
-
 
 		wet = FoaEncode.ar(wet, FoaEncoderMatrix.newAtoB);
 
