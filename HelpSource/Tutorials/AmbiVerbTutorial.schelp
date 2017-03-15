@@ -62,25 +62,142 @@ image:: shelf.png::
 Rather than multiplying this signal by a single coefficient (as we did with the reverberators), the signal is split into two shelf filters. These filters and then scaled with seperate variables, added back together, and sent back through the allpass chain. This allows for more precise, natural sounding dampening effects. For high level control, it makes more sense to define a decay argument (also refered to as ringtime) for each shelf rather than specifying these coefficients. We can do this by using the equation below with our decay arguments and the feedback delay value.
 
 code::g   = 10**(-3 * delay/decay) -->
-      Kny = 10**(-3 * feedbackDelay/highRingTime)
-      Koc = 10**(-3 * feedbackDelay/lowRingTime)
+
+Kny = 10**(-3 * feedbackDelay/highRingTime)
+
+Koc = 10**(-3 * feedbackDelay/lowRingTime)
+::
 
 section:: Conversion to Ambisonic
 
-To convert the tank reverberator to Ambisonics, we'll take a B-format signal and convert to A-format (tetrahedral orientation). This A-format signal then sent through four seperate monophonic reverberators each with individual delay time calculations corrisponding to similar rooms. The output these four monophonic reverberators is then modulated using hilbert phase rotation, converted back to B-format, coupled, converted to A again, and sent back throught the loop. This spreads the B-Format signal in space over time creating a spatial dispersion effect. SuperCollider's multichannel expansion and the Amb This section will cover the implementation of this effect.
+This tank reverberator is brought to a B-format context by converting out B-format signal to A and running this output through 4 instances of the monophonic tank structure above. Before the signal is sent back through the cascade, its coupled in B-format and transformed using phase rotation. The resulting signal is converted back to A-format (now altered in accordance to the prior image transforms) and sent again through the loop. This creates spatial diffusion over time. This section will speak in detail about this implementation.
+
+note::The majority of spatial manipulation of the signal is done using the Ambisonic Toolkit. For more information, see link::Guides/Intro-to-the-ATK::
+::
 
 subsection:: Going From B to A
 
+The signal is initially Decoded to A-format which outputs 4 signals corrisponding to the vertices a tetrahedral in space. One of the best ways to make something sound spatial is to transform each of these signals in a similar yet different fashion. In AmbiVerbSC, this is accomplished by calculating 4 different arrays of delay times based off of rooms with nearly identical dimensions. This corrisponds to 4 related monophonic reverberators which our A-format signal is sent through. With delay-time modulation this creates a strong foundation for a rich spatial image.
+
+SuperCollider makes this process easy with multichannel expansion. As long as the delay time arrays are manipulated properly, the A-format signal can be sent through the same code used for the monophonic reverb with no hiccups.
+
+note:: The signal is converted form B to A-format and back again using the Ambisonic ToolKit's BtoA and AtoB matrixes. (See  link::Classes/FoaEncoderMatrix#newAtoB:: link::Classes/FoaDecoderMatrix#newBtoA:: for details).::
 
 subsection:: Phase Rotation
 
+Once our A-format signal has been reverberated, delayed, and scaled, it is then sent through a phase rotator implemented with a link::Classes/Hilbert:: transform. This effect can be thought of as a proximity affect, that alters the ambiguity of our signal over time. Rather than rotating the signal around space, it sends our spatial image through the space to the opposite of its current location. This adds a considerable amount of depth to the reverberator.
+
 subsection:: Coupling
+
+The signal is then encoded back to B-Format so that it can be coupled. Coupling mixes the signals in space using a matrix. This allows for varying degrees of A-Format signal to pass through all of the reverberators rather than being fixed at a tetrahedral point. This mixing is implemented using the ATK's link::Classes/FoaRTT:: which is modulated with a series of link::Classes/LFNoise2::. This transformed signal is then converted back to A-format and sent again through the loop.
 
 section:: AmbiVerbGUI
 
 image::ambiverbgui.png::
 
+The AmbiVerbGUI was designed for easy exploration and experimentation of AmbiVerbSC. This section will go over the elements of the interface and some creative applications of its parameters.
+
+For descriptions of parameters, see link::Classes/AmbiVerbSC::
+
+subsection:: Interface
+
+(1) strong::Play:: button - Starts and stops audio
+
+(2) strong::Output:: - Defines whether or not AmbiVerbGUI's output is Stereo or B-format
+
+(3) strong::SoundFile:: - Selects B-Format files AmbiVerbGUI will play. Loops until stopped. Samples can be changed and added to by altering the sample folder inside of AmbiVerbSC's file location
+
+(4) strong::Gain:: - Changes gain of AmbiVerbGUI's output. Gain ranges from -inf to 6 decibles.
+
+(5) strong::Control:: - Dictates general parameters. number at top left indicates value of the paramater most recently manipulated.
+
+(5) strong::Spatial Diffusion:: - Dictates spatial dispersion parameters. Left number holds same function as control. For orientation, see link::Classes/FoaDecoderMatrix#newBtoA:: for list of tetrahedral positions
+
+note:: Hilbert and coup amounts specified as degree values form -360 to 360::
+
+(6) strong::Time Diffusion:: - Dictates parameters for diffusion in time.
+
+note:: Size and orientation parameters will stop the current sound when changed::
+
+subsection:: Application
+
+Below are some preset parameter listings that showcase some of the many interesting effects that can be acheived with AmbiVerbSC
+
+Strong::Natural Reverb:: - Subtle reverb similar to a large room. Full dispersion, resonable ring times, subtle modulation, and light mix.
+List::
+##mix = 0.41
+##preDelay = 0
+##crossover = 735.83
+##lowRT = 6
+##highRT = 1.52
+##orientation = flu
+##coupRate = 0.85
+##coupAmt = 360
+##hilbertRate = 0.23
+##hilbertAmt = -360
+##size = 7
+##dispersion = 1
+##spread =  1
+##modWidth = 0.1
+##modRate = 0.34
+::
+
+Strong::Lots of Echos:: - Dense echoing clusters,  quite chaotic. No time dispersion, small spread, moderately high ringtimes, subtle modulation.
+
+List::
+##mix = 0.77
+##preDelay = 0.13
+##crossover = 800
+##lowRT = 8.4
+##highRT = 6.28
+##orientation = flu
+##coupRate = 3.77
+##coupAmt = 360
+##hilbertRate = 3.02
+##hilbertAmt = -360
+##size = 7
+##dispersion = 0
+##spread =  0.18
+##modWidth = 0.11
+##modRate = 0.5
+::
+
+Strong::Wild Modulation:: - Warped reimaginings of the source. High ring times with aggresive spatial and time modulation.
+
+List::
+##mix = 0.94
+##preDelay = 1
+##crossover = 2735.83
+##lowRT = 8
+##highRT = 9
+##orientation = flr
+##coupRate = 9.87
+##coupAmt = 360
+##hilbertRate = 9.92
+##hilbertAmt = -360
+##size = 10
+##dispersion = 0.74
+##spread =  0.4
+##modWidth = 1
+##modRate = 10
+::
+
 section:: Conclusion
 
-Further exploration of the methods presented could lead to detailed room modeling, proximity effects for VR, and Ambisonic adaptations of other digital audio effects. This project was created in collaboration with the Center for Digital Arts and Experimental Media at the University of Washington under Dr.Joseph Anderson.
+This concludes the Tutorial for AmbiVerbSC. If you have any questions, comments or concerns feel free to email me at wenloj@uw.edu. This project would not have been possible without support from the Center for Digital Arts and Experimental Media at the University of Washington, and the guidence of Dr.Joseph Anderson.
+
+section:: References
+
+Anderson, Joseph, and Sean Costello. "Adapting artificial reverberation architectures for B-format signal processing." In Proc. of the Int. Ambisonics Symposium, Graz, Austria. 2009.
+
+Dattorro, Jon. "Effect design, part 1: Reverberator and other filters." Journal of the Audio Engineering Society 45, no. 9 (1997): 660-684.
+
+Dodge, Charles, and Thomas A. Jerse. Computer music: synthesis, composition and performance. Macmillan Library Reference, 1997.
+
+Lopez-Lezcano, Fernando. "An Architecture for Reverberation in High Order Ambisonics." In Audio Engineering Society Convention 137. Audio Engineering Society, 2014.
+
+Schroeder, Manfred R., and Benjamin F. Logan. "" Colorless" artificial reverberation." IRE Transactions on Audio 6 (1961): 209-214.
+
+Wiggins, Bruce, and Mark Dring. "AmbiFreeVerb 2—Development of a 3D Ambisonic Reverb with Spatial Warping and Variable Scattering." In Audio Engineering Society Conference: 2016 AES International Conference on Sound Field Control. Audio Engineering Society, 2016.
+
 
