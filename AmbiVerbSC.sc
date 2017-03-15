@@ -37,6 +37,7 @@ AmbiVerbSC {
 
 		lowG  = 10**(-3 * (feedbackDelay) / lowRT);
 		highG = 10**(-3 * (feedbackDelay) / highRT);
+
 		width =  dTs[7] * timeModWidth.linlin(0, 1, 0, 0.1);
 		maxDelay = dTs[7] + width;
 
