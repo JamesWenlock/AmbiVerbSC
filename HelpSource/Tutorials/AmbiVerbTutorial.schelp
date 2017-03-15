@@ -3,86 +3,52 @@ summary:: A detailed explanation of AmbiVerbSC's inner workings
 
 section:: Overview
 
-
 Ambisonics is an audio technique that allows for precise production, manipulation, and playback of full sphere surround sound. For the most part this method has been limited to academic circles, but recent advances in computing, software, and Virtual Reality (VR) have made Ambisonics more accessible and applicable than ever before. Although these developments are exciting, the amount effects designed for this audio methodology is minuscule in comparison to traditional audio environments.
 
-The purpose of AmbiVerbSC is to explore the Ambisonic implementation of traditional digital audio effects by creating an Ambisonic reverberator. To clarify, a reverberator is a structure that uses echoes to simulate the reflections of a 3D space. The algorithm (figure 1) is comprised of a delay-line cascade that is fed back into itself forming a feedback loop. Inside this loop, the summation of these delays is transformed in space over time to create a rich three dimensional spatial image. This tutorial will cover implementation and creative applications of this structure.
+The purpose of AmbiVerbSC is to explore the Ambisonic implementation of traditional digital audio effects by creating an Ambisonic reverberator. To clarify, a reverberator is a structure that uses echoes to simulate the reflections of a 3D space. The algorithm is comprised of a delay-line cascade that is fed back into itself forming a feedback loop. Inside this loop, the summation of these delays is transformed in space over time to create a rich three dimensional spatial image. This tutorial will cover implementation and a few creative applications of this structure.
 
-image:: tankdiagram.png::
+image:: ambiverbsc.png::
 
 section:: Tank Reverb Architecture
 
-The Tank Reverb Architecture consists of an allpass cascade inside of a feedback loop. Through every loop iteration, the signal is delayed and multiplied by a scaler value. The output consists of the summation of these passes sent through another allpass cascade. This section will go over the individual elements of this structure
+We'll begin by deconstructing the monophonic reverberation architecture AmbiVerbSC is built upon. It consists of of an allpass cascade inside of a feedback loop. Through every loop iteration, the signal is delayed and split into two frequency bands, and scaled. The output consists of the summation of these passes sent through another allpass cascade. A high pass controls DC, and the initial signal is added to a delayed output of of this structure to allow for predelay and mix control. This section will go over the individual elements of this structure.
 
-image:: monotank.png::
+image:: tank.png::
 
 subsection:: AllPass Cascades
 
-The AllPass cascade creates early reflections. AllPasses were chosen instead of comb filters because their frequency response stays consistent. This creates less color as the signal is passed through the chain.
+The AllPass cascade acts as the major echo generator in the signal flow. It consists of a series of modulated AllPass Reverberators with seperate delay and decay times. For AmbiVerbSC, these reverbators are implemented using link::Classes/AllpassL ::.
 
- link::Classes/FoaEncoderMatrix#newAtoB#Here's my text::
+image:: allpasschain.png::
 
-The AllPass filter needs 4 arguments to function:
+image:: allpassreverberator.png::
 
--max delay time
+Each AllPass filter needs 3 arguments to function: a max delay time, delay time, and decay. Rather than picking arbitrary values for these arguments, we'll use some fancy formulas and bit of algebra to calculate numbers that sound great!
 
--delay time
+The main equation we'll use is the following
 
--decay time
+image::Magic.png::
 
-decay = -3 * delay / (log10(g * dispersion));
+The g value specifies the scaler value for the delay line. For the allpass cascades this value is defined as the golden ratio and multipled by scaler argument to allow for varying degrees of dispersion. This number is the same for
 
-g = 10**(-3 * (delaySum + dTs[0]) / highRT);
+Delay times calculated with the normal modes of a rectangular room using the following formula.
 
+Image::Zolzer.png::
+Where:
 
-The delay times are calculated using a recurssive algorithm in conjunction with the RoomModes equation found in DAFX.
+c = the speed of sound
 
-- Uses cubic dimensions.
+[Ix, Iy, Iz] = dimensions of a room
 
-- Calculates room modes from these dimensions
+[Nx, Ny, Nz] = integer values
 
-- Sorts and returns 8 largest delay time from these modes
-
-- The following equation is used to calculate the rest of the arguments inside of the allpass.
-
-
-With these delay times calculated,Decay times are  using the following formula for each delay time
+This equation is used recursively to compute a large number of modal frequency estimates. The reciprocal of these modal values are taken and sorted from largest to shortest. The eight largest of these values is returned giving us an array of usable delaytimes that are accurate to our initial room dimensions.
 
 
-
-image:: allpass chain.png::time
-
-image:: allpass reverberator.png::
 
 subsection:: Feedback Delay
-The summation of this  allpass cascade is then delayed in accordance to the formulas below.
-
-code::
-maxFeedbackDelay = delaySum + dTs[0];
-feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, 0.1, 1);
-
-The maximum delay length is determined by summing the average delay times of the allpasses inside cascade and adding an additional delay. This value is than scaled by a spread argument to allow for control over the amount the allpass is fed through the feedback loop.
-
-For high level control, dictating a specified ring time (length at which the sound decays) is more useful that controlling a feedback scaler value. In order to get an accurate value
-
-
-decayTime = -3 * delayTime / (log10(g));
-
-The only issue with this formula is that decayTime is parameter that needs to be specified rather than g. With a bit of algebra we get the following.
-
-g = 10**(-3 * (delayTime) / decayTime);
-
-We can now specify a ringtime for AmbiVerbSC and get an accurate decay length.
 
 subsection:: Shelf Filter
-
-One common trait of many reverbs is a dampening argument that allows for control over the reverb spectrum. This can instantly improve  reverb sound great in many real spaces. However, this dampening in the majority of real spaces is not instantaneous. Typically,  feature of
-
-With this wet signal delayed, the signal must be scaled in order to prevent an infinite loop. Rather than using one scaler value formula seen the allpass cascade section we'll use a
-
-delay length and scaler values determine the length of the reverb and the amount of reflections present during this given length.
-
-The scaler value is calculated using the decay formula above except we're solving for the g (scaler value) instead of decay time. This maximum is then scaled by by a spread argument to allow for control over the amount the allpass chain is fed through the loop over time the specified ringtime.
 
 image:: shelf.png::
 
@@ -96,8 +62,9 @@ subsection:: Coupling
 
 section:: AmbiVerbGUI
 
-image:: ambiverbgui.png::
+image::ambiverbgui.png::
 
 section:: Conclusion
 
 Further exploration of the methods presented could lead to detailed room modeling, proximity effects for VR, and Ambisonic adaptations of other digital audio effects. This project was created in collaboration with the Center for Digital Arts and Experimental Media at the University of Washington under Dr.Joseph Anderson.
+
