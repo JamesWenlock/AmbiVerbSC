@@ -2,7 +2,7 @@ TITLE:: AmbiVerbSC
 summary:: Ambisonic tank reverb with coupling
 
 DESCRIPTION::
-An ambisonic tank reverb with coupling
+An ambisonic tank reverb with coupling. See link::Tutorials/AmbiVerbTutorial::.
 
 CLASSMETHODS::
 
@@ -48,4 +48,3 @@ returns::
 An UGen.
 
 EXAMPLES::
-

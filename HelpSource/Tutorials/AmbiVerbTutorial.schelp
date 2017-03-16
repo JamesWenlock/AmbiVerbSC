@@ -1,5 +1,6 @@
 title:: AmbiVerbSC Tutorial
 summary:: A detailed explanation of AmbiVerbSC's inner workings
+categories:: Tutorials
 
 section:: Overview
 
@@ -199,5 +200,3 @@ Lopez-Lezcano, Fernando. "An Architecture for Reverberation in High Order Ambiso
 Schroeder, Manfred R., and Benjamin F. Logan. "" Colorless" artificial reverberation." IRE Transactions on Audio 6 (1961): 209-214.
 
 Wiggins, Bruce, and Mark Dring. "AmbiFreeVerb 2—Development of a 3D Ambisonic Reverb with Spatial Warping and Variable Scattering." In Audio Engineering Society Conference: 2016 AES International Conference on Sound Field Control. Audio Engineering Society, 2016.
-
-
