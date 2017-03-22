@@ -9,40 +9,50 @@ CLASSMETHODS::
 METHOD:: ar
 
 argument::in
-
 incoming signal
 
 argument::mix
-
 mix of wet and dry signal (1 = wet, 0 = dry)
 
-argument::decay
-
-amount of time reflections fade
-
 argument::preDelay
-
 time between wet and dry signal
 
-argument::modAmt
-
-amount of delay time modulation
-
-argument::modRate
-
-rate of delay time modulation
-
 argument::crossoverFreq
-
 frequency low and high shelf cross
 
 argument::lowRT
-
 ring time of low shelf
 
 argument::highRT
-
 ring time of high shelf
+
+argument::dispersion
+
+argument::size
+
+argument::timeModWidth
+amount of delay time modulation
+
+argument::timeModRate
+rate of delay time modulation
+
+argument::coupRate
+
+argument::coupAmt
+
+argument::phaseRotRate
+
+argument::phaseRotAmt
+
+argument::orientation
+orientation of the tetrahedron used from A<>B format conversion
+
+argument::maxPreDelay
+
+argument::feedbackSpread
+
+argument::decay
+amount of time reflections fade
 
 returns::
 An UGen.
