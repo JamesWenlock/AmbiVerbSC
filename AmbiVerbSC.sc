@@ -8,8 +8,8 @@ AmbiVerbSC {
 		var g;
 		var lP, hP;
 		var low, high, lowG, highG;
-	    var dTs, decTs;
-	    var sum;
+	    	var dTs, decTs;
+	    	var sum;
 		var cascade, cascadeData;
 		var theseModes, sizeRange;
 		var coupRates;
