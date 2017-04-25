@@ -1,5 +1,6 @@
 TITLE:: AmbiVerbSC
 summary:: Ambisonic tank reverb with coupling
+categories:: Ambisonics
 
 DESCRIPTION::
 An ambisonic tank reverb with coupling. See link::Tutorials/AmbiVerbTutorial::.
