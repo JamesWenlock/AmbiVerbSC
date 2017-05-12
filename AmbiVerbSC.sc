@@ -1,31 +1,48 @@
 AmbiVerbSC {
 	*ar {arg in, mix = 1, preDelay = 0, crossoverFreq = 3000, lowRT = 10, highRT = 7, dispersion = 1, size = 7, timeModWidth = 0.2, timeModRate = 0.3, coupRate = 0.5, coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi, orientation  = \flu, maxPreDelay = 10, feedbackSpread = 1;
 		var dry, wet, out;
-		var allPassData;
-		var modVals;
+		var allPassData1, allPassData2;
 		var maxDelay, delay, delaySum;
 		var localBus;
-		var g;
-		var lP, hP;
-		var low, high, lowG, highG;
+		var g, low, high, lowG, highG;
 	    	var dTs, decTs;
-	    	var sum;
-		var cascade, cascadeData;
-		var theseModes, sizeRange;
-		var coupRates;
+	  	var sum;
 		var newLFMod, hilbert, hilbertAmt;
 		var width;
 		var maxFeedbackDelay, feedbackDelay;
 		var modes;
 		var hPFreq;
+		var dTBag, decTBag;
+		var apTwoLength;
+		var spreadRange, widthRange;
+		var phaseRotVar, coupRateVar;
+		var phaseRotRates, coupRates;
 
-		// Calculates delay times
-		sizeRange = [0.2, 0.7];
-		theseModes = {RoomModes.new({rrand(sizeRange[0], sizeRange[1]) + size}!3).returnRandVals(6)}!4;
-		dTs = theseModes.flop;
+		// # of allpasses in second cascade
+		apTwoLength = 3;
 
 		// g value = 1 /  golden ratio
 		g = 2 / (1 + sqrt(5));
+
+		// Highpass filter frequency
+		hPFreq = 20;
+
+		// Min and max of feedback spread scaler
+		spreadRange = [0.2, 1];
+
+		// Min and max of width scaler
+		widthRange = [0.01, 0.4];
+
+		// Defines rate of coupling
+		coupRateVar = [0.003, 0.0214];
+		coupRates = coupRate + {rrand(coupRateVar[0],coupRateVar[1])}!3;
+
+		// Defines rate of rotation
+		phaseRotVar = [0.003, 0.0214];
+		phaseRotRates = phaseRotRate + {rrand(phaseRotVar[0], phaseRotVar[1])}!4;
+
+		// Reads delay times from Data folder
+		dTs =  Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/" ++ size ++ ".txt");
 
 		// Calculates decay times
 		decTs = -3 * dTs / (log10(g * dispersion));
@@ -36,51 +53,45 @@ AmbiVerbSC {
 		});
 
 		// Calculates feedback delay time
-		maxFeedbackDelay = delaySum + dTs[0] - ControlRate.ir.reciprocal;
-		feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, 0.5, 1);
+		maxFeedbackDelay = delaySum + dTs[0] - ControlDur.ir;
+		feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, spreadRange[0], spreadRange[1]);
 
 		// Calculates g values for low and high shelf filters
 		lowG  = 10**(-3 * (feedbackDelay) / lowRT);
 		highG = 10**(-3 * (feedbackDelay) / highRT);
 
 		// Calculates width of modulation
-		width =  dTs[5] * timeModWidth.linlin(0, 1, 0, 0.4);
-		maxDelay = dTs[5] + width;
+		width =  dTs[dTs.size - 1] * timeModWidth.linlin(0, 1, widthRange[0], widthRange[1]);
+		maxDelay = dTs[dTs.size - 1] * 2;
+		dTs.poll;
+		dTs[dTs.size -1].poll;
 
-		// Highpass filter frequency
-		hPFreq = 20;
+		// Gets data from delay and decay times for first allpass cascade
+		allPassData1 = [dTs, decTs].flop;
 
-		// Data for first allpass cascade
-		allPassData = [
-			[dTs[0], decTs[0]],
-			[dTs[1], decTs[1]],
-			[dTs[2], decTs[2]],
-			[dTs[3], decTs[3]],
-			[dTs[4], decTs[4]],
-			[dTs[5], decTs[5]]
-
+		// Collects unique randomly selected delay and decay times from allPassCascade1 for second allpass cascade
+		dTBag = dTs.asBag;
+		allPassData2 = [
+			{var dT, decT;
+				dT = dTBag.choose;
+				dTBag.remove(dT);
+				decT = decTs.at(dTs.indexOf(dT));
+				[dT, decT];
+			}!apTwoLength
 		];
 
-		// Data for second allpass cascade
-		cascadeData = [
-			[dTs[2], decTs[2]],
-			[dTs[3], decTs[3]],
-			[dTs[4], decTs[4]],
-		];
-
-		// Decodes B-format signal
-		in = FoaDecode.ar(in, FoaDecoderMatrix.newBtoA(orientation));
-
-		// Sets dry value to initial signal
-		dry = in;
+		// Decodes B-format signal, sets dry value to initial signal
+		dry = FoaDecode.ar(in, FoaDecoderMatrix.newBtoA(orientation));
 
 		// Sums dry signal with feedback from allpass chain
-		sum =  dry + LocalIn.ar(4);
+		sum =  (sqrt(1 - (lowG**2)) * dry) + LocalIn.ar(4);
 
-		// first allpass cascade
-		allPassData.do({arg thisData;
+		// First allpass allPass2
+		allPassData1.do({arg thisData;
+			var delay = thisData[0] + LFNoise2.ar(timeModRate, (width/2));
+			delay = delay.abs;
 			sum = AllpassL.ar(sum, maxDelay,
-				thisData[0] + LFNoise2.kr(timeModRate, width),
+				delay,
 				thisData[1]);
 		});
 
@@ -96,18 +107,18 @@ AmbiVerbSC {
 		low = low * lowG;
 		high = high * highG;
 		wet = low + high;
+		wet = wet*lowG;
 
 		// Applies hilbert phase rotation
-		newLFMod = LFNoise2.kr({phaseRotRate + rrand(0.003,0.0214)}!4, phaseRotAmt);
+		newLFMod = LFNoise2.kr(phaseRotRates, phaseRotAmt);
 		hilbert = wet;
 		hilbert.collectInPlace({arg item, i;
-		item = (Hilbert.ar(item) * [newLFMod[i].cos, newLFMod[i].sin]).sum;
+			item = (Hilbert.ar(item) * [newLFMod[i].cos, newLFMod[i].sin]).sum;
 		});
 		wet = hilbert;
 
 		// Applies coupling in B-format with RTT
 		wet = FoaEncode.ar(wet, FoaEncoderMatrix.newAtoB);
-		coupRates = {coupRate + rrand(0.003,0.0214)}!3;
 		wet = FoaRTT.ar(wet, LFNoise2.kr(coupRates[0], coupAmt), LFNoise2.kr(coupRates[1], coupAmt), LFNoise2.kr(coupRates[2], coupAmt));
 		wet = FoaDecode.ar(wet, FoaDecoderMatrix.newBtoA);
 
@@ -118,9 +129,11 @@ AmbiVerbSC {
 		wet = DelayN.ar(wet, ControlRate.ir.reciprocal, ControlRate.ir.reciprocal);
 
 		// Second allpass cascade
-		cascade.do({arg thisData;
+		allPassData2.do({arg thisData;
+			var delay = thisData[0] + LFNoise2.ar(timeModRate, (width / 2));
+			delay = delay.abs;
 			wet = AllpassL.ar(wet, maxDelay,
-				thisData[0] + LFNoise2.kr(timeModRate, width),
+				 delay,
 				thisData[1]);
 		});
 
