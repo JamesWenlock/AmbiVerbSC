@@ -14,6 +14,13 @@ AmbiVerbSC can be installed using the Quarks gui in supercollier.
 
 ## Getting Started
 
+To use the AmbiVerbSC GUI, run the following code - 
+
+AmbiVerbGUI(s);
+
+A description of AmbiVerbSC's inner workings can be found on the AmbiVerbSC tutorial page in the help browser. Parameter details can be found in the class help file. 
+
+[Click this link](http://doc.sccode.org/Tutorials/Mark_Polishook_tutorial/04_Help.html) for more information on SuperCollider Help
 
 ## Built With
 
