@@ -1,4 +1,4 @@
-VerbTestV3 {
+AmbiVerbGUI {
 	var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server, timeSig, bpm;
 	var bus, monoBus, stereoBus, bFormatBus, synthGroup, busGroup;
 	var params, monoSynth;
