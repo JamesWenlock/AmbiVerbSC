@@ -1,4 +1,4 @@
-VerbTestV3 {
+AmbiVerbGUI {
 	var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server, timeSig, bpm;
 	var bus, monoBus, stereoBus, bFormatBus, synthGroup, busGroup;
 	var params, monoSynth;
@@ -30,6 +30,8 @@ VerbTestV3 {
 	}
 
 	setSynth {
+//		params[7].postln;
+//		params[8].postln;
 		(soundPlay.isPlaying).if({
 		soundPlay.set(\amp, amp, \mix, params[0], \preDelay, params[1], \crossoverFreq, params[2], \lowRT, params[3], \highRT, params[4], \dispersion, params[5], \modWidth, params[7], \modRate, params[8], \coupRate, params[9], \coupAmt, params[10], \phaseRotRate, params[11], \phaseRotAmt, params[12], \phaseRotMix, params[13], \spread, params[14]);
 		});
@@ -147,13 +149,12 @@ VerbTestV3 {
 					);
 					text.string_(knobVal.round(0.01)).asString;
 					rads = ((knobVal * pi)/180);
-					rads.postln;
 					if(thisData.size > 5,
 						{params[thisData[3]] = rads},
 						{params[thisData[3]] = knobVal}
 					);
 					this.setSynth;
-					params.postln;
+//					params.postln;
 				}).valueAction_(
 					if (thisData[4] == True,
 						{params[thisData[3]].linlin(thisData[2][0], thisData[2][1], 0, 1)},
@@ -200,8 +201,8 @@ VerbTestV3 {
 				[\size, 0, [0, 1], 15, True],
 				[\dispersion, 1, [0, 1], 5, True],
 				[\spread, 1, [0, 1], 14, True],
+				[\modRate,0.221, [0.001, 10], 8, False],
 				[\modWidth, 0.2, [0, 1], 7, True],
-				[\modRate,0.221, [0, 10], 8, True]
 			],
 			//Rect.new(390, 48, 200, 125),
 			Rect.new(45 + (320 * 2), 125, 310, 175),
@@ -211,10 +212,10 @@ VerbTestV3 {
 			"Spatial Diffusion",
 			[
 				[\orientation,1, [0, 1], 13, True],
-				[\coupRate, 0.2, [0, 10], 9, True],
-				[\coupAmt, 0, [-360, 360], 10, True, 1],
-				[\hilbertRate, 0.221, [0, 10], 11, True],
-				[\hilbertAmt, 0, [-360, 360], 12, True, 1],
+				[\coupRate, 0.2, [0.001, 10], 9, False],
+				[\coupAmt, 0, [0, 360], 10, True, 1],
+				[\hilbertRate, 0.221, [0.001, 10], 11, False],
+				[\hilbertAmt, 0, [0, 360], 12, True, 1],
 			],
 			Rect.new(45 + 320, 125, 310, 175),
 			Color.green.alpha_(0.2)
@@ -273,7 +274,6 @@ VerbTestV3 {
 				sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer), loop: 1);
 				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), orient, 10,spread.lag(0.5));
 				sig = sig * amp.lag(0.5);
-				sig = Limiter.ar(sig);
 				Out.ar(0, amp * FoaDecode.ar(sig, FoaDecoderMatrix.newStereo));
 			}
 		).add;
@@ -281,11 +281,9 @@ VerbTestV3 {
 		SynthDef.new(\SoundFileBFormat,
 			{arg amp = 1, da = 2, buffer, mix = 0.7, preDelay = 0, crossoverFreq = 3000, lowRT = 8, highRT = 3, dispersion = 1, modWidth = 0.2, modRate =  0.2, coupRate= 0.2, coupAmt = 2pi, phaseRotRate = 0.23, phaseRotAmt = 2pi, phaseRotMix = 1, spread = 1;
 				var sig;
-				orient.postln;
 				sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer), loop: 1);
 				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), orient, 10,spread.lag(0.5));
 				sig = sig * amp.lag(0.5);
-				sig = Limiter.ar(sig);
 				Out.ar(0, sig);
 			}
 		).add;
@@ -306,5 +304,3 @@ VerbTestV3 {
 		});
 	}
 }
-
-

@@ -54,8 +54,83 @@ argument::feedbackSpread
 
 argument::decay
 amount of time reflections fade
+=======
+argument:: in
+
+incoming signal
+
+argument:: mix
+
+mix of wet and dry signal (1 = wet, 0 = dry)
+
+argument:: preDelay
+
+time between wet and dry signal in seconds
+
+argument:: crossoverFreq
+
+crossover frequency of low and high shelf filters
+
+argument:: lowRT
+
+amount of time low shelf filter feedback takes to fade in seconds
+
+argument:: highRT
+
+amount of time high shelf filter feedback takes to fade in seconds
+
+argument:: dispersion
+
+controls delay times of allpass reverberators, aka amount of smearing in time
+(1 = 100% dispersion, 0 = 0% dispersion)
+
+argument:: size
+
+controls maximum allpass delay times and number of allpass filters, aka reflection qualities of space. see below for accepted symbols
+
+argument:: timeModWidth
+
+scales maximum amount allpass reverberator delay times modulated (1 = maximum modulation, 0 = no modulation)
+
+argument:: timeModeRate
+
+rate at which allpass reverberators modulated (in hz)
+
+argument:: coupRate
+
+rate at which RTT couples signal in feedback loop (in hz)
+
+argument:: coupAmt
+
+amount RTT couples signal in feedback loop (in degrees, rotation = +- theta)
+
+argument:: phaseRotRate
+
+rate at which Hilbert phase rotation is applied to A format signal in feedback loop
+
+argument:: phaseRotAmt
+
+amount of Hilbert phase rotation applied to A format signal in feedback loop (in degrees)
+
+argument:: orientation
+
+defines initial orientation of A-format signal (see link::Classes/FoaDecoderMatrix#newBtoA:: for list of tetrahedral positions)
+
+argument:: maxPreDelay
+
+defines maximum amount of pre-delay
+
+argument:: feedbackSpread
+
+controls amount of time between feedback loop iterations (0 = min time, 1 = max time)
 
 returns::
 An UGen.
 
 EXAMPLES::
+
+code::
+// Opens AmbiVerbGUI, s defines server
+
+AmbiVerbGUI(s);
+::
