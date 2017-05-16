@@ -1,5 +1,12 @@
 AmbiVerbSC {
-	*ar {arg in, mix = 1, preDelay = 0, crossoverFreq = 3000, lowRT = 10, highRT = 7, dispersion = 1, size = 7, timeModWidth = 0.2, timeModRate = 0.3, coupRate = 0.5, coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi, orientation  = \flu, maxPreDelay = 10, feedbackSpread = 1;
+
+	*ar {
+		arg in, mix = 1, preDelay = 0, crossoverFreq = 3000,
+		lowRT = 10, highRT = 7, dispersion = 1, size = 7,
+		timeModWidth = 0.2, timeModRate = 0.3, coupRate = 0.5,
+		coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi,
+		orientation  = \flu, maxPreDelay = 10, feedbackSpread = 1;
+
 		var dry, wet, out;
 		var allPassData1, allPassData2;
 		var maxDelay, delay, delaySum;
