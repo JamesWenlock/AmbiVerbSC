@@ -120,7 +120,8 @@ AmbiVerbGUI {
 		};
 
 
-		bufPath = PathName.new("Samples".resolveRelative);
+		bufPath = PathName(Atk.userSoundsDir ++ "/b-format").entries;
+
 		bufPath.entries.do({arg path;
 			var thisPath = path.fileName.split(separator: $.);
 			bufNames = bufNames.add(thisPath[0]);
