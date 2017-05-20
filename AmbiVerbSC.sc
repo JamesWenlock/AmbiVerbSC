@@ -70,8 +70,6 @@ AmbiVerbSC {
 		// Calculates width of modulation
 		width =  dTs[dTs.size - 1] * timeModWidth.linlin(0, 1, widthRange[0], widthRange[1]);
 		maxDelay = dTs[dTs.size - 1] * 2;
-		dTs.poll;
-		dTs[dTs.size -1].poll;
 
 		// Gets data from delay and decay times for first allpass cascade
 		allPassData1 = [dTs, decTs].flop;
@@ -114,7 +112,6 @@ AmbiVerbSC {
 		low = low * lowG;
 		high = high * highG;
 		wet = low + high;
-		wet = wet*lowG;
 
 		// Applies hilbert phase rotation
 		newLFMod = LFNoise2.kr(phaseRotRates, phaseRotAmt);
