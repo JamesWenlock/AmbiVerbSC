@@ -274,7 +274,7 @@ AmbiVerbGUI {
 				sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer), loop: 1);
 				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), orient, 10,spread.lag(0.5));
 				sig = sig * amp.lag(0.5);
-				Out.ar(0, amp * FoaDecode.ar(sig, FoaDecoderMatrix.newStereo));
+				Out.ar(0, FoaDecode.ar(sig, FoaDecoderMatrix.newStereo));
 			}
 		).add;
 
