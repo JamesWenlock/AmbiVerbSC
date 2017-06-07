@@ -149,3 +149,59 @@ code::
 
 AmbiVerbGUI(s);
 ::
+
+code::
+(
+// Adapted from B-format Sound File Binaural Decoder Code
+// Plays Default Ambiverb Decoded with a binaural (HRTF) decoder
+
+var cond, decoder, sndbuf, synth;
+s.options.memSize_(2**20);
+
+// boot the server
+s.boot;
+
+// wait for the server to boot
+cond = Condition.new;
+s.waitForBoot({
+
+
+    Routine.run({
+
+        // define a binaural decoder
+        decoder = FoaDecoderKernel.newListen(1013);
+
+        // load sound file into a buffer
+        sndbuf = Buffer.read(s, Atk.userSoundsDir ++ "/b-format/Pampin-On_Space.wav");
+
+        s.sync(cond);
+
+        // synth to decode our B-format sound file
+        SynthDef(\kernelDecode, {arg buffer;
+            var out, src;
+
+            // play B-format sound file
+            src = PlayBuf.ar(sndbuf.numChannels, buffer, BufRateScale.kr(buffer), loop: 1);
+			src = AmbiVerbSC.ar(src);
+            // decode using decoder
+            out = FoaDecode.ar(src, decoder);
+
+
+            Out.ar(0, out);
+        }).add;
+
+        s.sync(cond);
+
+        synth = Synth(\kernelDecode, [\buffer, sndbuf]);
+
+        // press command period when done
+        CmdPeriod.doOnce({
+            synth.free;
+            decoder.free;
+            sndbuf.free
+        });
+    })
+})
+)
+
+::
