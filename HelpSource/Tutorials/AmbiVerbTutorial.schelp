@@ -16,54 +16,51 @@ Center for Digital Arts and Experimental Media, University of Washington - https
 title:: AmbiVerbSC Tutorial
 summary:: A detailed explanation of AmbiVerbSC's inner workings
 categories:: Tutorials
-
 section:: Overview
 
 Ambisonics is an audio technique that allows for precise production, manipulation, and playback of full sphere surround sound. For the most part this method has been limited to academic circles, but recent advances in computing, software, and Virtual Reality (VR) have made Ambisonics more accessible and applicable than ever before. Although these developments are exciting, the amount effects designed for this audio methodology is minuscule in comparison to traditional audio environments.
 
 The purpose of AmbiVerbSC is to explore the Ambisonic implementation of traditional digital audio effects by creating an Ambisonic reverberator. The algorithm is comprised of a delay-line cascade that is fed back into itself forming a feedback loop. Inside this loop, the summation of these delays is transformed in space over time to create a rich three dimensional spatial image. This tutorial will cover implementation and a few creative applications of this structure.
 
-image:: ambiverbsc.png#Figure 1::
+image:: ambiverbsc.png#Figure 1 - AmbiVerbSC reverberator structure::
 
 section:: Tank Reverb Architecture
 
-We'll begin by deconstructing the monophonic reverberation architecture AmbiVerbSC is built upon. It consists of an schroeder allpass cascade inside of a feedback loop. Through every loop iteration the signal is delayed and sent through a frequency dependent scaler. The output consists of the summation of these passes sent through another schroeder allpass cascade. A high pass controls low-frequency build upFootnote::Often referred to as DC. Click this link for more information::, and the initial signal is added to a delayed output of of this structure to allow for predelay and mix control. This section will go over the individual elements of this structure.
+We'll begin by deconstructing the monophonic reverberation architecture AmbiVerbSC is built upon. It consists of an Schroeder allpass cascade inside of a feedback loop. Through every loop iteration the signal is delayed and sent through a frequency dependent scaler. The output consists of the summation of these passes sent through another Schroeder allpass cascade. A high pass controls low-frequency build up, and the initial signal is added to a delayed output of this structure to allow for predelay and mix control. This section will go over the individual elements of this structure.
 
-image:: tank.png#Figure 2::
+image:: tank.png#Figure 2 - Monophonic reverberator structure::
 
 subsection:: AllPass Cascades
 
-image:: allpasschain.png#Figure 3::
+image:: allpasschain.png#Figure 3 - Schroeder allpass cascade::
 
-The schroeder allpass cascade (Figure 3) acts as the major echo generator in the signal flow. It contains a series of unique modulated schroeder allpass reverberators (Figure 4). These allpasses are implemented using link::Classes/AllpassL ::
+The Schroeder allpass cascade (Figure 3) acts as the major echo generator in the signal flow, functioning to diffuse the signal in time. It contains a series of unique modulated Schroeder allpass reverberators (Figure 4). These allpasses are implemented using link::Classes/AllpassL ::
 
-image:: allpassreverberator.png#Figure 4::
+image:: allpassreverberator.png#Figure 4 - Schroeder allpass reverberator::
 
-Each reverberator needs 2 arguments to function: a delay time(tau), and a scaler value(g). The delay time represents the amount of time the signal is delayed in seconds, and the scaler value specifies the amount the output will be reduced as it runs through the feedback loop. A resulting variable of this system is decay(T60), defined as the time it takes for the output decreases to -60db.These values are related via the following formula.
+Each reverberator needs 2 arguments to function: a delay time, and a scaler value. The delay value represents the amount of time the signal is delayed in seconds, and the scaler value specifies the amount the output will be reduced as it runs through the feedback loop. A resulting variable of this system is decay, defined as the time it takes for the output decreases to -60db.These values are related via the following formulas.
 
 Image::delay.png::
 
+Image::DecayVars.png::
+
 With a bit of algebra, any of the reverberator's parameters can be calculated so long as two are defined. For the allpass cascade, the two parameters we'll specify are a scaler value and delay times.
 
-The g value is set as the reciprocal of the golden ratio (2 / (1 + sqrt(5))) and multipled by scaler argument to allow for varying degrees of time dispersion (decay of each reverberator). This number will be constant for all of our allpasses.
+The g value is set as the reciprocal of the golden ratio and multipled by scaler argument to allow for varying degrees of time dispersion (decay of each reverberator). This number is the same for all of our allpasses.
 
 Delay times calculated from the normal modes of a rectangular room using the following formula.
 
 Image::Zolzer.png::
 
-Where
+Image::ZolzerMath.png::
 
-c = the speed of sound
-
-[Ix, Iy, Iz] = dimensions of a room
-
-[Nx, Ny, Nz] = integer values
+To clarify, room modes can be defined as the collected standing waves of a room when a sound source is present. As sound reflects off the various surfaces of a space, certain frequencies are emphasized. The reciprocal of these values provides delay values directly related to the space.
 
 This equation is used recursively to compute a large number of modal frequency estimates. The reciprocal of these modal values are taken and sorted from largest to shortest resulting an array of usable delaytimes that are accurate to our initial room dimensions.
 
 We can now plug these values into our initial formula to get the parameters needed for link::Classes/AllpassL ::.
 
-The final piece of the allpass puzzle is delay-line modulation. This simulates the imperfections of a room and blurs resonances making the tank sound more realistic. Modulation is acheived using individual link::Classes/LFNoise2:: ugens for each allpass. The amount of modulation is controlled using a width argument with width corrisponding to a scaler of the smallest delay time in the cascade. The rate is unversal for each allpass.
+The final piece of the allpass puzzle is delay-line modulation. This simulates the imperfections of a room and blurs resonances making the tank sound more realistic. Modulation is acheived using individual link::Classes/LFNoise2:: ugens for each allpass. The amount of modulation is controlled using a width argument with width corrisponding to a scaler of the smallest delay time in the cascade. The rate is universal for each allpass.
 
 subsection:: Feedback Loop
 
@@ -77,11 +74,9 @@ image:: shelf.png#Figure 5::
 
 Rather than multiplying this signal by a single coefficient (as we did with the reverberators), the signal is split into two shelf filters. These filters and then scaled with seperate variables, added back together, and sent back through the allpass chain. This allows for a more natural sounding dampening effects. For high level control, it makes more sense to define a decay argument (also refered to as ringtime) for each shelf rather than specifying these coefficients. We can do this by using the equations below with our decay arguments and the feedback delay value.
 
-
 Image:: g value.png::
 
 Image:: Kny.png::
-
 
 Image::Kdc.png::
 
@@ -103,13 +98,13 @@ note:: The signal is converted form B to A-format and back again using the Ambis
 
 subsection:: Phase Rotation
 
-image:: phase.png#Figure 6::
+image:: phase.png#Figure 6 Hilbert phase rotator::
 
-Once our A-format signal has been reverberated, delayed, and scaled, it is then sent through a phase rotator implemented with a link::Classes/Hilbert:: transform. This effect can be thought of as a proximity affect, that alters the ambiguity of our signal over time. Rather than rotating the signal around space, it sends our spatial image through the space to the opposite of its current location. This adds a considerable amount of depth to the reverberator.
+Once our A-format signal has been reverberated, delayed, and scaled, it is converted to B-format and sent through a phase rotator (Figure) implemented with a link::Classes/Hilbert:: transform. The rotator can be thought of as a proximity effect that alters the ambiguity of our signal over time. Rather than rotating the signal around space, it sends our spatial image through the space to the opposite of its current location. This adds a considerable amount of depth to the output.
 
 subsection:: Coupling
 
-The signal is then encoded back to B-Format so that it can be coupled. Coupling mixes the signals in space using a matrix. This allows for varying degrees of A-Format signal to pass through all of the reverberators rather than being fixed at a tetrahedral point. This mixing is implemented using the ATK's link::Classes/FoaRTT:: which is modulated with a series of link::Classes/LFNoise2::. This transformed signal is then converted back to A-format and sent again through the loop.
+Still in B-format, the signal is then coupled. Coupling mixes the signals in space using a matrix. This allows for varying degrees of A-Format signal to pass through all of the reverberators rather than being fixed at a tetrahedral point. This mixing is implemented using the ATK's link::Classes/FoaRTT:: which is modulated with a series of link::Classes/LFNoise2::. This transformed signal is then converted back to A-format and sent again through the loop.
 
 section:: AmbiVerbGUI
 
@@ -133,7 +128,7 @@ subsection:: Interface
 
 (5) strong::Spatial Diffusion:: - Dictates spatial dispersion parameters. Left number holds same function as control. For orientation, see link::Classes/FoaDecoderMatrix#newBtoA:: for list of tetrahedral positions
 
-note:: Hilbert and coup amounts specified as degree values form -360 to 360::
+note:: Hilbert and coup amounts specified as degree values from 0 to 360::
 
 (6) strong::Time Diffusion:: - Dictates parameters for diffusion in time.
 
@@ -219,3 +214,5 @@ Lopez-Lezcano, Fernando. "An Architecture for Reverberation in High Order Ambiso
 Schroeder, Manfred R., and Benjamin F. Logan. " "Colorless" artificial reverberation." IRE Transactions on Audio 6 (1961): 209-214.
 
 Wiggins, Bruce, and Mark Dring. "AmbiFreeVerb 2—Development of a 3D Ambisonic Reverb with Spatial Warping and Variable Scattering." In Audio Engineering Society Conference: 2016 AES International Conference on Sound Field Control. Audio Engineering Society, 2016.
+
+
