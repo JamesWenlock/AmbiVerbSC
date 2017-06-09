@@ -45,6 +45,29 @@ AVPreset {
 		^paramDict;
 	}
 
+	writeDict {arg name, dict;
+
+		var paramDict = Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/default.txt");
+
+		params.do({arg thisData;
+			paramDict.put(thisData[0], thisData[1]);
+		});
+
+		paramDict.writeArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/" ++ name  ++ ".txt");
+	}
+
+	read {arg preset, params;
+		var paramDict = Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/" ++ preset.asString ++ ".txt");
+
+		params.do({arg thisData;
+			paramDict.put(thisData[0], thisData[1])
+		});
+
+		^paramDict;
+	}
+
+
+
 	list {
 		var presetPaths = PathName(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets").entries;
 		presetPaths.do({arg path;
