@@ -14,14 +14,15 @@ Center for Digital Arts and Experimental Media, University of Washington - https
 */
 
 AmbiVerbGUI {
-var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server, timeSig, bpm;
+	var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server;
 	var bus, monoBus, stereoBus, bFormatBus, synthGroup, busGroup;
-	var params, monoSynth;
+	var params, params, monoSynth;
 	var paramBox, soundPlay;
 	var decoder;
 	var size;
 	var amp;
 	var orient;
+	var presets;
 
 	// Creates new instance of AmbiverbGUI
 	*new {arg server;
@@ -43,13 +44,16 @@ var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server,
 		server.waitForBoot({
 
 			// Specifies initial parameters and builds GUI
+
+			params = AVPreset.new.read("default");
+			params.postln;
 			orient = 'flu';
 			bufNames = [];
 			buffers  = Dictionary.new;
 			curSource = "SoundFileStereo".asSymbol;
-			size = 7;
+			size = params[\size];
+			orient = params[\orient];
 			amp = 1;
-			params = [0.7, 0, 700, 9, 3, 1, 7,  0.2, 0.2, 0.5, 2pi, 0.67, 2pi, 1, 1, 0];
 			this.makeGUI;
 		})
 	}
@@ -57,7 +61,21 @@ var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server,
 	// Updates AmbiverbSC parameters
 	setSynth {
 		(soundPlay.isPlaying).if({
-		soundPlay.set(\amp, amp, \mix, params[0], \preDelay, params[1], \crossoverFreq, params[2], \lowRT, params[3], \highRT, params[4], \dispersion, params[5], \modWidth, params[7], \modRate, params[8], \coupRate, params[9], \coupAmt, params[10], \phaseRotRate, params[11], \phaseRotAmt, params[12], \phaseRotMix, params[13], \spread, params[14]);
+		soundPlay.set(
+				\amp, amp,
+				\mix, params[\mix],
+				\preDelay, params[\preDelay],
+				\crossoverFreq, params[\crossoverFreq],
+				\lowRT, params[\lowRT],
+				\highRT, params[\highRT],
+				\dispersion, params[\dispersion],
+				\modWidth, params[\modWidth],
+				\modRate, params[\modRate],
+				\coupRate, params[\coupRate],
+				\coupAmt, params[\coupAmt],
+				\phaseRotRate, params[\phaseRotRate],
+				\phaseRotAmt, params[\phaseRotAmt],
+				\spread, params[\spread]);
 		});
 	}
 
@@ -180,7 +198,7 @@ var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server,
 			outView.decorator_(FlowLayout(outView.bounds, 5@5, 10@10));
 
 			StaticText(outView, rect.width - 15 @ 30).string_(name).font_(guiFont.pixelSize_(20)).stringColor_(Color.green).align_(\center).background_(Color.black.alpha_(0.5));
-			text = StaticText(outView, 145@25).string_(data[0][1]).font_(guiFont.pixelSize_(20))
+			text = StaticText(outView, 145@25).string_(params[data[0]]).font_(guiFont.pixelSize_(20))
 			.stringColor_(Color.green).align_(\center);
 
 			// Creates parameter knobs and links them to AmbiverbSC
@@ -188,25 +206,32 @@ var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server,
 				var knob, knobVal, thisText;
 
 				knob = Knob(outView, 30@25).color_([Color.black, Color.green, Color.green, Color.green])
+//					[\mix, [0, 1], True],
+
 				.action_({arg thisKnob;
 					var rads;
-					if (thisData[4] == True,
-						{knobVal = thisKnob.value.linlin(0, 1, thisData[2][0], thisData[2][1])},
-						{knobVal = thisKnob.value.linexp(0, 1, thisData[2][0], thisData[2][1])}
+					if (thisData[2] == True,
+						{knobVal = thisKnob.value.linlin(0, 1, thisData[1][0], thisData[1][1])},
+						{knobVal = thisKnob.value.linexp(0, 1, thisData[1][0], thisData[1][1])}
 					);
 					text.string_(knobVal.round(0.01)).asString;
 					rads = ((knobVal * pi)/180);
-					if(thisData.size > 5,
-						{params[thisData[3]] = rads},
-						{params[thisData[3]] = knobVal}
+					if(thisData.size > 4,
+						{params.put(thisData[3], rads)},
+						{params.put(thisData[3], knobVal)}
 					);
 					this.setSynth;
+					thisData[0].postln;
+					thisData[1].postln;
 				}).valueAction_(
-					if (thisData[4] == True,
-						{params[thisData[3]].linlin(thisData[2][0], thisData[2][1], 0, 1)},
-						{params[thisData[3]].explin(thisData[2][0], thisData[2][1], 0, 1)}
+					if((thisData[3] != \orient),
+						{
+							if (thisData[2] == True,
+								{params[thisData[3]].linlin(thisData[1][0], thisData[1][1], 0, 1)},
+								{params[thisData[3]].explin(thisData[1][0], thisData[1][1], 0, 1)}
+							)
+						},
 					);
-
 				);
 				thisText = StaticText(outView, 105@30).string_(thisData[0].asString)
 				.font_(guiFont.pixelSize_(15))
@@ -230,47 +255,6 @@ var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server,
 				buttons[\play].valueAction_(0);
 				this.initSynths;
 			});
-		};
-
-		// Builds individual parameter views
-		buildParamViews = {
-			createParams.value(
-				"Control",
-				[
-					[\mix, 0.5, [0, 1], 0, True],
-					[\preDelay, 0, [0, 3], 1, True],
-					[\crossover, 4000, [100, 10000], 2, False],
-					[\lowRT, 3, [0.01, 10], 3, True],
-					[\highRT, 0.05, [0.01, 10], 4, True],
-				],
-				Rect.new(45, 125, 310, 175),
-				Color.green.alpha_(0.2)
-			);
-			createParams.value(
-				"Time Diffusion",
-				[
-					[\size, 0, [0, 1], 15, True],
-					[\dispersion, 1, [0, 1], 5, True],
-					[\spread, 1, [0, 1], 14, True],
-					[\modRate,0.221, [0.001, 10], 8, False],
-					[\modWidth, 0.2, [0, 1], 7, True],
-				],
-				//Rect.new(390, 48, 200, 125),
-				Rect.new(45 + (320 * 2), 125, 310, 175),
-				Color.green.alpha_(0.2)
-			);
-			createParams.value(
-				"Spatial Diffusion",
-				[
-					[\orientation,1, [0, 1], 13, True],
-					[\coupRate, 0.2, [0.001, 10], 9, False],
-					[\coupAmt, 0, [0, 360], 10, True, 1],
-					[\hilbertRate, 0.221, [0.001, 10], 11, False],
-					[\hilbertAmt, 0, [0, 360], 12, True, 1],
-				],
-				Rect.new(45 + 320, 125, 310, 175),
-				Color.green.alpha_(0.2)
-			);
 		};
 
 		// Creates knob that dictates master gain
@@ -304,6 +288,44 @@ var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server,
 		makeSource.value();
 		addSourceBehavior.value();
 		makeTitle.value();
+		// Builds individual parameter views
+			createParams.value(
+				"Control",
+				[
+					[\mix, [0, 1], True, \mix],
+					[\preDelay, [0, 3], True, \preDelay],
+					[\crossover, [100, 10000], False, \crossoverFreq],
+					[\lowRT, [0.01, 10], True, \lowRT],
+					[\highRT, [0.01, 10], True, \highRT],
+				],
+				Rect.new(45, 125, 310, 175),
+				Color.green.alpha_(0.2)
+			);
+			createParams.value(
+				"Time Diffusion",
+				[
+					[\size, [0, 1], True, \size],
+					[\dispersion, [0, 1], True, \dispersion],
+					[\spread, [0, 1], True, \spread],
+					[\modRate, [0.001, 10], False, \modRate],
+					[\modWidth, [0, 1], True, \modWidth],
+				],
+				//Rect.new(390, 48, 200, 125),
+				Rect.new(45 + (320 * 2), 125, 310, 175),
+				Color.green.alpha_(0.2)
+			);
+			createParams.value(
+				"Spatial Diffusion",
+				[
+					[\orientation, [0, 1], True, \orient],
+					[\coupRate, [0.001, 10], False, \coupRate],
+					[\coupAmt, [0, 360], True, \coupAmt, 1],
+					[\phaseRotRate, [0.001, 10], False, \phaseRotRate],
+					[\phaseRotAmt, [0, 360], True, \phaseRotAmt, 1],
+				],
+				Rect.new(45 + 320, 125, 310, 175),
+				Color.green.alpha_(0.2)
+			);
 		this.initSynths;
 		buildParamViews.value();
 		createSizeParam.value();
@@ -350,4 +372,14 @@ var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server,
 			soundPlay.free;
 		});
 	}
+
+	saveParams {arg name = "current";
+		presets.writeDict(name, dict);
+	}
+
+	loadParams {
+
+	}
 }
+
+
