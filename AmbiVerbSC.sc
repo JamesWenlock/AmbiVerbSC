@@ -64,7 +64,7 @@ AmbiVerbSC {
 		phaseRotRates = phaseRotRate + {rrand(phaseRotVar[0], phaseRotVar[1])}!4;
 
 		// Reads delay times from Data folder
-		dTs =  Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/" ++ size ++ ".txt");
+		dTs =  Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/DelayTimes/" ++ size ++ ".txt");
 
 		// Calculates decay times
 		decTs = -3 * dTs / (log10(g * dispersion));
