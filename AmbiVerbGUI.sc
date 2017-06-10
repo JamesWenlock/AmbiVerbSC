@@ -1,7 +1,7 @@
-/* 
+/*
 <AmbiVerbSC - James Wenlock>
 Center for Digital Arts and Experimental Media, University of Washington - https://dxarts.washington.edu/
-   
+
    Copyright (C) <2017>  <James Wenlock>
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ AmbiVerbGUI {
 	var size;
 	var amp;
 	var orient;
-	var presets;
+	var preset, curPreset, popUp;
 
 	// Creates new instance of AmbiverbGUI
 	*new {arg server;
@@ -44,10 +44,10 @@ AmbiVerbGUI {
 		server.waitForBoot({
 
 			// Specifies initial parameters and builds GUI
-
-			params = AVPreset.new.read("default");
+			preset  = AVPreset.new;
+			curPreset = "default";
+			params = preset.read(curPreset);
 			params.postln;
-			orient = 'flu';
 			bufNames = [];
 			buffers  = Dictionary.new;
 			curSource = "SoundFileStereo".asSymbol;
@@ -60,6 +60,8 @@ AmbiVerbGUI {
 
 	// Updates AmbiverbSC parameters
 	setSynth {
+		"setting synth".postln;
+		params.postln;
 		(soundPlay.isPlaying).if({
 		soundPlay.set(
 				\amp, amp,
@@ -94,6 +96,10 @@ AmbiVerbGUI {
 		var bufPath;
 		var controls;
 		var makeTitle, titleFont;
+		var makePresets, saveWIndow;
+		var paramViews;
+
+		paramViews = Dictionary.new;
 
 		// Defines fonts depending on OS
 		if (Font.availableFonts[0] == "AR BERKLEY",
@@ -114,6 +120,7 @@ AmbiVerbGUI {
 			gui = Window.new("verbTest", Rect.new(700, 500, 1060, 350), false)
 			.background_(Color.black).alwaysOnTop_(true).front
 			.onClose_({
+				this.stop;
 				server.freeAll;
 				server.quit;
 			});
@@ -146,8 +153,13 @@ AmbiVerbGUI {
 
 			bufPath.do({arg path;
 				var thisPath = path.fileName.split(separator: $.);
-				bufNames = bufNames.add(thisPath[0]);
-				buffers.put(thisPath[0].asSymbol, Buffer.read(server, path.fullPath));
+				thisPath[1].postln;
+				if ((thisPath[1] == "wav") && (thisPath.size ==  2) ,
+					{
+						bufNames = bufNames.add(thisPath[0]);
+						buffers.put(thisPath[0].asSymbol, Buffer.read(server, path.fullPath));
+					}
+				)
 			});
 
 			buffer = buffers[bufNames[0].asSymbol];
@@ -206,25 +218,28 @@ AmbiVerbGUI {
 				var knob, knobVal, thisText;
 
 				knob = Knob(outView, 30@25).color_([Color.black, Color.green, Color.green, Color.green])
-//					[\mix, [0, 1], True],
 
 				.action_({arg thisKnob;
-					var rads;
-					if (thisData[2] == True,
-						{knobVal = thisKnob.value.linlin(0, 1, thisData[1][0], thisData[1][1])},
-						{knobVal = thisKnob.value.linexp(0, 1, thisData[1][0], thisData[1][1])}
+					if(((thisData[3] != \orient) && (thisData[3] != \size)),
+						{
+							var rads;
+							if (thisData[2] == True,
+								{knobVal = thisKnob.value.linlin(0, 1, thisData[1][0], thisData[1][1])},
+								{knobVal = thisKnob.value.linexp(0, 1, thisData[1][0], thisData[1][1])}
+							);
+							text.string_(knobVal.round(0.01)).asString;
+							rads = ((knobVal * pi)/180);
+							if(thisData.size > 4,
+								{params.put(thisData[3], rads)},
+								{params.put(thisData[3], knobVal)}
+							);
+							this.setSynth;
+							thisData[0].postln;
+							thisData[1].postln;
+						},
 					);
-					text.string_(knobVal.round(0.01)).asString;
-					rads = ((knobVal * pi)/180);
-					if(thisData.size > 4,
-						{params.put(thisData[3], rads)},
-						{params.put(thisData[3], knobVal)}
-					);
-					this.setSynth;
-					thisData[0].postln;
-					thisData[1].postln;
 				}).valueAction_(
-					if((thisData[3] != \orient),
+					if(((thisData[3] != \orient) && (thisData[3] != \size)),
 						{
 							if (thisData[2] == True,
 								{params[thisData[3]].linlin(thisData[1][0], thisData[1][1], 0, 1)},
@@ -238,30 +253,33 @@ AmbiVerbGUI {
 				.stringColor_(Color.green);
 
 			});
+			paramViews.put(name, outView);
 		};
 
 		// Makes GUI Title text
 		makeTitle = {
-			var titleView = CompositeView(gui, Rect.new(395 + 100, 35, 600 - 100, 80)).background_(Color.green.alpha_(0.5));
-			StaticText(titleView, Rect(0, 0, 600 - 100, 80)).background_(Color.black.alpha_(0.8)).string_("AmbiVerbSC").font_(titleFont).stringColor_(Color.green).align_(\center);
+			var titleView = CompositeView(gui, Rect.new(395 + 200, 35, 600 - 200, 80)).background_(Color.green.alpha_(0.5));
+			StaticText(titleView, Rect(0, 0, 600 - 200, 80)).background_(Color.black.alpha_(0.8)).string_("AmbiVerbSC").font_(titleFont).stringColor_(Color.green).align_(\center);
 		};
 
 		// Creates text box specifying size parameter
 		createSizeParam = {
-			TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSize_(15))
+			paramViews.put(\sizeParam,
+TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSize_(15))
 			.stringColor_(Color.green).background_(Color.black).value_(7)
 			.action_({arg text;
 				size = text.value.asInteger.round(1);
+				params.put(\size, size);
 				buttons[\play].valueAction_(0);
 				this.initSynths;
-			});
+			}));
 		};
 
 		// Creates knob that dictates master gain
 		makeGainKnob = {
-			StaticText(gui,  Rect.new(418, 35, 40, 40)).align_(\center).font_(guiFont.pixelSize_(15))
+			StaticText(gui,  Rect.new(394 + 140, 35, 40, 40)).align_(\center).font_(guiFont.pixelSize_(15))
 			.stringColor_(Color.green).background_(Color.black).string_("Gain");
-			Knob(gui, Rect.new(420, 70, 40, 40))
+			Knob(gui, Rect.new(394 + 143,  72 , 35,  35))
 			.color_([Color.black, Color.green, Color.green, Color.green]).action_({arg obj;
 				obj.value.postln;
 				amp = obj.value(0, 1, 0, 2);
@@ -271,24 +289,20 @@ AmbiVerbGUI {
 
 		// Creates popup menu for selecting B-format orientation
 		makeOrientMenu = {
-			PopUpMenu(gui, Rect.new(517, 170, 43, 28)).items_(["flu","fld","flr","fud","fbd","flru", "flrd"])
+			var menu = PopUpMenu(gui, Rect.new(517, 170, 43, 28)).items_(["flu","fld","flr","fud","fbd","flru", "flrd"])
 			.font_(guiFont.pixelSize_(15)).action_({arg obj;
 				buttons[\play].valueAction_(0);
 				orient = obj.item.asSymbol;
+				params.put(\orient, orient);
 				this.initSynths;
 			})
 			.stringColor_(Color.green)
 			.background_(Color.black);
+
+			paramViews.put(\menu, menu);
 		};
 
-		createWindow.value();
-		makePlayButton.value();
-		makeOutput.value();
-		makeEndButton.value();
-		makeSource.value();
-		addSourceBehavior.value();
-		makeTitle.value();
-		// Builds individual parameter views
+		buildParamViews = {
 			createParams.value(
 				"Control",
 				[
@@ -307,13 +321,14 @@ AmbiVerbGUI {
 					[\size, [0, 1], True, \size],
 					[\dispersion, [0, 1], True, \dispersion],
 					[\spread, [0, 1], True, \spread],
-					[\modRate, [0.001, 10], False, \modRate],
+					[\modRate, [0.01, 5], False, \modRate],
 					[\modWidth, [0, 1], True, \modWidth],
 				],
 				//Rect.new(390, 48, 200, 125),
 				Rect.new(45 + (320 * 2), 125, 310, 175),
 				Color.green.alpha_(0.2)
 			);
+
 			createParams.value(
 				"Spatial Diffusion",
 				[
@@ -326,11 +341,57 @@ AmbiVerbGUI {
 				Rect.new(45 + 320, 125, 310, 175),
 				Color.green.alpha_(0.2)
 			);
-		this.initSynths;
+		 };
+
+		createWindow.value();
+		makePlayButton.value();
+		makeOutput.value();
+		makeEndButton.value();
+		makeSource.value();
+		addSourceBehavior.value();
+		makePresets.value();
+		makeTitle.value();
 		buildParamViews.value();
+			popUp = PopUpMenu(gui, Rect.new(255 + 125 + 10, 80, 125, 30)).items_(preset.list)
+			.font_(guiFont.pixelSize_(12))
+			.stringColor_(Color.green)
+			.background_(Color.black)
+			.action_({arg obj;
+				buttons[\play].valueAction_(0);
+				params = preset.read(obj.item);
+				paramViews.keys.do({arg thisKey;
+					paramViews[thisKey].remove;
+				});
+				buildParamViews.value();
+			    createSizeParam.value();
+			    makeOrientMenu.value();
+			});
+
+		Button(gui, Rect.new(255 + 125 + 10, 80 - 30 - 5, 125, 30)).states_(
+				[
+					["Save", Color.black, Color.green]
+				]
+			)
+			.font_(guiFont.pixelSize_(25))
+			.background_(Color.black)
+			.action_({arg obj;
+				saveWIndow = Window.new("Save Preset", Rect.new(700,  gui.bounds.top +  gui.bounds.height - 60, 320, 60), false)
+				.background_(Color.black).alwaysOnTop_(true).front;
+				TextField(saveWIndow, Rect.new(20, 20 , 280, 30))
+				.stringColor_(Color.green)
+				.background_(Color.black)
+				.action_({arg obj;
+					preset.writeDict(obj.string, params);
+					popUp.items_(preset.list);
+					saveWIndow.close;
+				});
+		});
+
+		this.initSynths;
 		createSizeParam.value();
 		makeGainKnob.value();
 		makeOrientMenu.value();
+
 	}
 
 	// Intiallizes synth busses
@@ -360,7 +421,24 @@ AmbiVerbGUI {
 
 	// Starts audio
 	start {
-		soundPlay = Synth(curSource, [\buffer, buffer]);
+		params.postln;
+		soundPlay = Synth(curSource,
+			[
+				\buffer, buffer, \amp, amp,
+				\mix, params[\mix],
+				\preDelay, params[\preDelay],
+				\crossoverFreq, params[\crossoverFreq],
+				\lowRT, params[\lowRT],
+				\highRT, params[\highRT],
+				\dispersion, params[\dispersion],
+				\modWidth, params[\modWidth],
+				\modRate, params[\modRate],
+				\coupRate, params[\coupRate],
+				\coupAmt, params[\coupAmt],
+				\phaseRotRate, params[\phaseRotRate],
+				\phaseRotAmt, params[\phaseRotAmt],
+				\spread, params[\spread]
+		]);
 		NodeWatcher.register(soundPlay);
 	}
 
@@ -374,11 +452,11 @@ AmbiVerbGUI {
 	}
 
 	saveParams {arg name = "current";
-		presets.writeDict(name, dict);
+		preset.write(name, params);
 	}
 
-	loadParams {
-
+	loadPreset {arg name = "default";
+		params = preset.read(name);
 	}
 }
 
