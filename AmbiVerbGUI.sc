@@ -160,7 +160,7 @@ AmbiVerbGUI {
 					}
 				)
 			});
-
+			buffers.postln;
 			buffer = buffers[bufNames[0].asSymbol];
 
 			popUp = PopUpMenu(gui, Rect.new(255, 80, 125, 30)).items_(bufNames)
@@ -261,15 +261,26 @@ AmbiVerbGUI {
 
 		// Creates text box specifying size parameter
 		createSizeParam = {
+			var sizePaths;
+			var sizeNames;
+
+			sizeNames = Array.new;
+			sizePaths = PathName(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/DelayTimes").entries;
+
+			sizePaths.do({arg path;
+				var thisPath = path.fileName.split(separator: $.);
+						sizeNames = sizeNames.add(thisPath[0]);
+			});
+
 			paramViews.put(\sizeParam,
-TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSize_(15))
-				.stringColor_(Color.green).background_(Color.black).value_(7)
+PopUpMenu(gui, Rect.new(842, 170, 35, 28)).font_(guiFont.pixelSize_(15))
+				.items_(sizeNames)
+				.stringColor_(Color.green).background_(Color.black)
 			.action_({arg text;
-				size = text.value.asInteger.round(1);
-				params.put(\size, size);
 				buttons[\play].valueAction_(0);
+				params.put(\size, text);
 				this.initSynths;
-			}));
+			}).valueAction_("3"));
 		};
 
 		// Creates knob that dictates master gain

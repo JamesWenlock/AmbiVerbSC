@@ -9,52 +9,6 @@ CLASSMETHODS::
 
 METHOD:: ar
 
-argument::in
-incoming signal
-
-argument::mix
-mix of wet and dry signal (1 = wet, 0 = dry)
-
-argument::preDelay
-time between wet and dry signal
-
-argument::crossoverFreq
-frequency low and high shelf cross
-
-argument::lowRT
-ring time of low shelf
-
-argument::highRT
-ring time of high shelf
-
-argument::dispersion
-
-argument::size
-
-argument::timeModWidth
-amount of delay time modulation
-
-argument::timeModRate
-rate of delay time modulation
-
-argument::coupRate
-
-argument::coupAmt
-
-argument::phaseRotRate
-
-argument::phaseRotAmt
-
-argument::orientation
-orientation of the tetrahedron used from A<>B format conversion
-
-argument::maxPreDelay
-
-argument::feedbackSpread
-
-argument::decay
-amount of time reflections fade
-=======
 argument:: in
 
 incoming signal
@@ -92,7 +46,7 @@ argument:: timeModWidth
 
 scales maximum amount allpass reverberator delay times modulated (1 = maximum modulation, 0 = no modulation)
 
-argument:: timeModeRate
+argument:: timeModRate
 
 rate at which allpass reverberators modulated (in hz)
 
@@ -129,8 +83,10 @@ An UGen.
 
 EXAMPLES::
 
+
 code::
-// Opens AmbiVerbGUI, s defines server
+// Opens AmbiVerbGUI
+// s = default server
 
 AmbiVerbGUI(s);
 ::
@@ -188,5 +144,8 @@ s.waitForBoot({
     })
 })
 )
+::
+
+code ::
 
 ::
