@@ -59,9 +59,5 @@ AVPreset {
 		});
 		^names;
 	}
-<<<<<<< HEAD
-}
-=======
 }
 
->>>>>>> e554f4243eaaac1bf4f0b7d89bb7c9977b09501b
