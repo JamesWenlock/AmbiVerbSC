@@ -273,14 +273,9 @@ AmbiVerbGUI {
 			});
 
 			paramViews.put(\sizeParam,
-<<<<<<< HEAD
 PopUpMenu(gui, Rect.new(842, 170, 35, 28)).font_(guiFont.pixelSize_(15))
 				.items_(sizeNames)
 				.stringColor_(Color.green).background_(Color.black)
-=======
-TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSize_(15))
-				.stringColor_(Color.green).background_(Color.black).value_(7)
->>>>>>> e554f4243eaaac1bf4f0b7d89bb7c9977b09501b
 			.action_({arg text;
 				buttons[\play].valueAction_(0);
 				params.put(\size, text);
@@ -295,11 +290,7 @@ TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSi
 			Knob(gui, Rect.new(394 + 143,  72 , 35,  35))
 			.mode_(\vert)
 			.color_([Color.black, Color.green, Color.green, Color.green]).action_({arg obj;
-<<<<<<< HEAD
-				amp = obj.value(0, 1, 0, 4);
-=======
 				amp = obj.value(0, 1, 0, 3);
->>>>>>> e554f4243eaaac1bf4f0b7d89bb7c9977b09501b
 				soundPlay.set(\amp, amp);
 			}).valueAction_(0.5);
 		};
