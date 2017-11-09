@@ -21,7 +21,6 @@ AVPreset {
 	}
 
 	init {
-
 	}
 
 	write {arg name, params;
@@ -32,29 +31,13 @@ AVPreset {
 			paramDict.put(thisData[0], thisData[1]);
 		});
 
-		paramDict.writeArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/" ++ name  ++ ".txt");
-	}
-
-	read {arg preset, params;
-		var paramDict = Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/" ++ preset.asString ++ ".txt");
-
-		params.do({arg thisData;
-			paramDict.put(thisData[0], thisData[1])
-		});
-
-		^paramDict;
+		this.writeDict(name, paramDict);
 	}
 
 	writeDict {arg name, dict;
-
-		var paramDict = Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/default.txt");
-
-		params.do({arg thisData;
-			paramDict.put(thisData[0], thisData[1]);
-		});
-
-		paramDict.writeArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/" ++ name  ++ ".txt");
+		dict.writeArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/" ++ name  ++ ".txt");
 	}
+
 
 	read {arg preset, params;
 		var paramDict = Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/" ++ preset.asString ++ ".txt");
@@ -66,15 +49,19 @@ AVPreset {
 		^paramDict;
 	}
 
-
-
 	list {
 		var presetPaths = PathName(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets").entries;
-		presetPaths.do({arg path;
+		var names;
+
+		names = presetPaths.collect({arg path;
 			var thisPath = path.fileName.split(separator: $.);
-			thisPath[0].postln;
+			thisPath[0];
 		});
+		^names;
 	}
+<<<<<<< HEAD
+}
+=======
 }
 
-
+>>>>>>> e554f4243eaaac1bf4f0b7d89bb7c9977b09501b

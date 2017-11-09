@@ -14,9 +14,9 @@ Center for Digital Arts and Experimental Media, University of Washington - https
 */
 
 AmbiVerbGUI {
-	var gui, buttons, sounds, bufNames, buffers, buffer, curSource, outputs, server;
-	var bus, monoBus, stereoBus, bFormatBus, synthGroup, busGroup;
-	var params, params, monoSynth;
+	var gui, buttons, sounds, bufNames, buffers, buffer, curOutput, outputs, server;
+	var bus, busGroup;
+	var params;
 	var paramBox, soundPlay;
 	var decoder;
 	var size;
@@ -31,6 +31,7 @@ AmbiVerbGUI {
 
 	// Initiallizes AmbiverbGUI
 	init {arg thisServer;
+
 		// Sets server
 		server = thisServer;
 
@@ -39,10 +40,8 @@ AmbiVerbGUI {
 
 		// Specifies maximum output busses
 		server.options.numOutputBusChannels = 4;
-
 		server.boot;
 		server.waitForBoot({
-
 			// Specifies initial parameters and builds GUI
 			preset  = AVPreset.new;
 			curPreset = "default";
@@ -50,7 +49,7 @@ AmbiVerbGUI {
 			params.postln;
 			bufNames = [];
 			buffers  = Dictionary.new;
-			curSource = "SoundFileStereo".asSymbol;
+			curOutput = "Stereo";
 			size = params[\size];
 			orient = params[\orient];
 			amp = 1;
@@ -96,7 +95,7 @@ AmbiVerbGUI {
 		var bufPath;
 		var controls;
 		var makeTitle, titleFont;
-		var makePresets, saveWIndow;
+		var makePresets, saveWindow;
 		var paramViews;
 
 		paramViews = Dictionary.new;
@@ -117,7 +116,7 @@ AmbiVerbGUI {
 
 		// Creates GUI Window and view
 		createWindow = {
-			gui = Window.new("verbTest", Rect.new(700, 500, 1060, 350), false)
+			gui = Window.new("AmbiVerb", Rect.new(700, 500, 1060, 350), false)
 			.background_(Color.black).alwaysOnTop_(true).front
 			.onClose_({
 				this.stop;
@@ -161,7 +160,7 @@ AmbiVerbGUI {
 					}
 				)
 			});
-
+			buffers.postln;
 			buffer = buffers[bufNames[0].asSymbol];
 
 			popUp = PopUpMenu(gui, Rect.new(255, 80, 125, 30)).items_(bufNames)
@@ -181,19 +180,17 @@ AmbiVerbGUI {
 		// Creates button for users to select audio output
 		makeOutput = {
 			buttons.put(\output,
-				Button(view, 125@30).states_([
-					["Stereo", Color.green, Color.black],
-					["B-Format", Color.green, Color.black]])
-				.font_(guiFont.pixelSize_(25))
+				PopUpMenu(view, 125@30)
+				.items_(["Stereo", "BFormat"])
+				.font_(guiFont.pixelSize_(12))
+				.stringColor_(Color.green)
+				.background_(Color.black);
 			);
 			buttons[\output].action_({arg button;
 				button.value.postln;
 				buttons[\play].valueAction_(0);
-				if (button.value == 0,
-					{curSource = "SoundFileStereo".asSymbol},
-					{curSource = "SoundFileBFormat".asSymbol}
-				);
-				curSource.postln;
+				curOutput = button.item;
+				curOutput.postln;
 				this.initSynths;
 			});
 		};
@@ -217,7 +214,7 @@ AmbiVerbGUI {
 			data.do({arg thisData, i;
 				var knob, knobVal, thisText;
 
-				knob = Knob(outView, 30@25).color_([Color.black, Color.green, Color.green, Color.green])
+				knob = Knob(outView, 30@25).mode_(\vert).color_([Color.black, Color.green, Color.green, Color.green])
 
 				.action_({arg thisKnob;
 					if(((thisData[3] != \orient) && (thisData[3] != \size)),
@@ -264,15 +261,31 @@ AmbiVerbGUI {
 
 		// Creates text box specifying size parameter
 		createSizeParam = {
+			var sizePaths;
+			var sizeNames;
+
+			sizeNames = Array.new;
+			sizePaths = PathName(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/DelayTimes").entries;
+
+			sizePaths.do({arg path;
+				var thisPath = path.fileName.split(separator: $.);
+						sizeNames = sizeNames.add(thisPath[0]);
+			});
+
 			paramViews.put(\sizeParam,
+<<<<<<< HEAD
+PopUpMenu(gui, Rect.new(842, 170, 35, 28)).font_(guiFont.pixelSize_(15))
+				.items_(sizeNames)
+				.stringColor_(Color.green).background_(Color.black)
+=======
 TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSize_(15))
-			.stringColor_(Color.green).background_(Color.black).value_(7)
+				.stringColor_(Color.green).background_(Color.black).value_(7)
+>>>>>>> e554f4243eaaac1bf4f0b7d89bb7c9977b09501b
 			.action_({arg text;
-				size = text.value.asInteger.round(1);
-				params.put(\size, size);
 				buttons[\play].valueAction_(0);
+				params.put(\size, text);
 				this.initSynths;
-			}));
+			}).valueAction_("3"));
 		};
 
 		// Creates knob that dictates master gain
@@ -280,9 +293,13 @@ TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSi
 			StaticText(gui,  Rect.new(394 + 140, 35, 40, 40)).align_(\center).font_(guiFont.pixelSize_(15))
 			.stringColor_(Color.green).background_(Color.black).string_("Gain");
 			Knob(gui, Rect.new(394 + 143,  72 , 35,  35))
+			.mode_(\vert)
 			.color_([Color.black, Color.green, Color.green, Color.green]).action_({arg obj;
-				obj.value.postln;
-				amp = obj.value(0, 1, 0, 2);
+<<<<<<< HEAD
+				amp = obj.value(0, 1, 0, 4);
+=======
+				amp = obj.value(0, 1, 0, 3);
+>>>>>>> e554f4243eaaac1bf4f0b7d89bb7c9977b09501b
 				soundPlay.set(\amp, amp);
 			}).valueAction_(0.5);
 		};
@@ -343,15 +360,7 @@ TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSi
 			);
 		 };
 
-		createWindow.value();
-		makePlayButton.value();
-		makeOutput.value();
-		makeEndButton.value();
-		makeSource.value();
-		addSourceBehavior.value();
-		makePresets.value();
-		makeTitle.value();
-		buildParamViews.value();
+		makePresets = {arg buildParamViews;
 			popUp = PopUpMenu(gui, Rect.new(255 + 125 + 10, 80, 125, 30)).items_(preset.list)
 			.font_(guiFont.pixelSize_(12))
 			.stringColor_(Color.green)
@@ -367,7 +376,7 @@ TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSi
 			    makeOrientMenu.value();
 			});
 
-		Button(gui, Rect.new(255 + 125 + 10, 80 - 30 - 5, 125, 30)).states_(
+			Button(gui, Rect.new(255 + 125 + 10, 80 - 30 - 5, 125, 30)).states_(
 				[
 					["Save", Color.black, Color.green]
 				]
@@ -375,29 +384,46 @@ TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSi
 			.font_(guiFont.pixelSize_(25))
 			.background_(Color.black)
 			.action_({arg obj;
-				saveWIndow = Window.new("Save Preset", Rect.new(700,  gui.bounds.top +  gui.bounds.height - 60, 320, 60), false)
-				.background_(Color.black).alwaysOnTop_(true).front;
-				TextField(saveWIndow, Rect.new(20, 20 , 280, 30))
+				saveWindow = Window.new("Save Preset",
+					Rect.new(700,  gui.bounds.top +  gui.bounds.height - 60, 320, 60), false)
+				.background_(Color.black).alwaysOnTop_(true).front(true);
+				TextField(saveWindow, Rect.new(20, 20 , 280, 30))
 				.stringColor_(Color.green)
 				.background_(Color.black)
 				.action_({arg obj;
 					preset.writeDict(obj.string, params);
 					popUp.items_(preset.list);
-					saveWIndow.close;
+					saveWindow.close;
 				});
-		});
+			});
+		};
 
-		this.initSynths;
+
+		createWindow.value();
+		makePlayButton.value();
+		makeOutput.value();
+		makeEndButton.value();
+		makeSource.value();
+		addSourceBehavior.value();
+		makePresets.value();
+		makeTitle.value();
+		buildParamViews.value();
+		makePresets.value(buildParamViews);
 		createSizeParam.value();
 		makeGainKnob.value();
 		makeOrientMenu.value();
+		this.initSynths;
+	}
+
+	initBus {
+		"bus!!".postln;
 
 	}
 
 	// Intiallizes synth busses
 	initSynths {
-		SynthDef.new(\SoundFileStereo,
-			{arg amp = 1, buffer, mix = 0.7, preDelay = 0, crossoverFreq = 3000, lowRT = 8, highRT = 3, dispersion = 1, modWidth = 0.2, modRate =  0.2, coupRate= 0.2, coupAmt = 2pi, phaseRotRate = 0.23, phaseRotAmt = 2pi, phaseRotMix = 1, spread = 1;
+		SynthDef.new(\Stereo,
+			{arg amp = 1, buffer, mix = 0.7, preDelay = 0, crossoverFreq = 3000, lowRT = 8, highRT = 3, dispersion = 1, modWidth = 0.2, modRate =  0.2, coupRate= 0.2, coupAmt = 2pi, phaseRotRate = 0.23, phaseRotAmt = 2pi, phaseRotMix = 1, spread = 1, out;
 				var sig;
 				orient.postln;
 				sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer), loop: 1);
@@ -407,9 +433,10 @@ TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSi
 			}
 		).add;
 
-		SynthDef.new(\SoundFileBFormat,
-			{arg amp = 1, da = 2, buffer, mix = 0.7, preDelay = 0, crossoverFreq = 3000, lowRT = 8, highRT = 3, dispersion = 1, modWidth = 0.2, modRate =  0.2, coupRate= 0.2, coupAmt = 2pi, phaseRotRate = 0.23, phaseRotAmt = 2pi, phaseRotMix = 1, spread = 1;
+		SynthDef.new(\BFormat,
+			{arg amp = 1, buffer, mix = 0.7, preDelay = 0, crossoverFreq = 3000, lowRT = 8, highRT = 3, dispersion = 1, modWidth = 0.2, modRate =  0.2, coupRate= 0.2, coupAmt = 2pi, phaseRotRate = 0.23, phaseRotAmt = 2pi, phaseRotMix = 1, spread = 1, out;
 				var sig;
+				orient.postln;
 				sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer), loop: 1);
 				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), orient, 10,spread.lag(0.5));
 				sig = sig * amp.lag(0.5);
@@ -422,7 +449,7 @@ TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSi
 	// Starts audio
 	start {
 		params.postln;
-		soundPlay = Synth(curSource,
+		soundPlay = Synth(curOutput.asSymbol,
 			[
 				\buffer, buffer, \amp, amp,
 				\mix, params[\mix],
@@ -437,8 +464,8 @@ TextField(gui, Rect.new(842, 170, 35, 28)).align_(\center).font_(guiFont.pixelSi
 				\coupAmt, params[\coupAmt],
 				\phaseRotRate, params[\phaseRotRate],
 				\phaseRotAmt, params[\phaseRotAmt],
-				\spread, params[\spread]
-		]);
+				\spread, params[\spread],
+		], target:busGroup);
 		NodeWatcher.register(soundPlay);
 	}
 

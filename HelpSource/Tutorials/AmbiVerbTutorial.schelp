@@ -7,13 +7,13 @@ Ambisonics is an audio technique that allows for precise production, manipulatio
 
 The purpose of AmbiVerbSC is to explore the Ambisonic implementation of traditional digital audio effects by creating an Ambisonic reverberator. The algorithm is comprised of a delay-line cascade that is fed back into itself forming a feedback loop. Inside this loop, the summation of these delays is transformed in space over time to create a rich three dimensional spatial image. This tutorial will cover implementation and a few creative applications of this structure.
 
-image:: ambiverbsc.png#Figure 1 - AmbiVerbSC reverberator structure::
+image:: ambiverb.png#Figure 1 - AmbiVerbSC reverberator structure::
 
 section:: Tank Reverb Architecture
 
 We'll begin by deconstructing the monophonic reverberation architecture AmbiVerbSC is built upon. It consists of an Schroeder allpass cascade inside of a feedback loop. Through every loop iteration the signal is delayed and sent through a frequency dependent scaler. The output consists of the summation of these passes sent through another Schroeder allpass cascade. A high pass controls low-frequency build up, and the initial signal is added to a delayed output of this structure to allow for predelay and mix control. This section will go over the individual elements of this structure.
 
-image:: tank.png#Figure 2 - Monophonic reverberator structure::
+image:: monotank.png#Figure 2 - Monophonic reverberator structure::
 
 subsection:: AllPass Cascades
 
@@ -23,11 +23,9 @@ The Schroeder allpass cascade (Figure 3) acts as the major echo generator in the
 
 image:: allpassreverberator.png#Figure 4 - Schroeder allpass reverberator::
 
-Each reverberator needs 2 arguments to function: a delay time, and a scaler value. The delay value represents the amount of time the signal is delayed in seconds, and the scaler value specifies the amount the output will be reduced as it runs through the feedback loop. A resulting variable of this system is decay, defined as the time it takes for the output decreases to -60db.These values are related via the following formulas.
+Each reverberator needs 2 arguments to function: a delay time, and a scaler value. The delay value represents the amount of time the signal is delayed in seconds, and the scaler value specifies the amount the output will be reduced as it runs through the feedback loop. A resulting variable of this system is decay, defined as the time it takes for the output decreases to -60db.These values are related via the following formula.
 
-Image::delay.png::
-
-Image::DecayVars.png::
+Image::t60equation.png::
 
 With a bit of algebra, any of the reverberator's parameters can be calculated so long as two are defined. For the allpass cascade, the two parameters we'll specify are a scaler value and delay times.
 
@@ -36,8 +34,6 @@ The g value is set as the reciprocal of the golden ratio and multipled by scaler
 Delay times calculated from the normal modes of a rectangular room using the following formula.
 
 Image::Zolzer.png::
-
-Image::ZolzerMath.png::
 
 To clarify, room modes can be defined as the collected standing waves of a room when a sound source is present. As sound reflects off the various surfaces of a space, certain frequencies are emphasized. The reciprocal of these values provides delay values directly related to the space.
 
@@ -59,11 +55,7 @@ image:: shelf.png#Figure 5::
 
 Rather than multiplying this signal by a single coefficient (as we did with the reverberators), the signal is split into two shelf filters. These filters and then scaled with seperate variables, added back together, and sent back through the allpass chain. This allows for a more natural sounding dampening effects. For high level control, it makes more sense to define a decay argument (also refered to as ringtime) for each shelf rather than specifying these coefficients. We can do this by using the equations below with our decay arguments and the feedback delay value.
 
-Image:: g value.png::
-
-Image:: Kny.png::
-
-Image::Kdc.png::
+Image:: math.png::
 
 
 section:: Conversion to Ambisonic
