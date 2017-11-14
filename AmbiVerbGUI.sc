@@ -213,9 +213,8 @@ AmbiVerbGUI {
 			// Creates parameter knobs and links them to AmbiverbSC
 			data.do({arg thisData, i;
 				var knob, knobVal, thisText;
-
+				params[thisData[3]].postln;
 				knob = Knob(outView, 30@25).mode_(\vert).color_([Color.black, Color.green, Color.green, Color.green])
-
 				.action_({arg thisKnob;
 					if(((thisData[3] != \orient) && (thisData[3] != \size)),
 						{
@@ -238,9 +237,18 @@ AmbiVerbGUI {
 				}).valueAction_(
 					if(((thisData[3] != \orient) && (thisData[3] != \size)),
 						{
+							var num;
+							if((thisData[3] == \phaseRotAmt) || (thisData[3] == \coupAmt),
+								{
+									num = (params[thisData[3]] * 180 / pi)
+								},
+								{
+									num = params[thisData[3]];
+								}
+							);
 							if (thisData[2] == True,
-								{params[thisData[3]].linlin(thisData[1][0], thisData[1][1], 0, 1)},
-								{params[thisData[3]].explin(thisData[1][0], thisData[1][1], 0, 1)}
+								{num.linlin(thisData[1][0], thisData[1][1], 0, 1)},
+								{num.explin(thisData[1][0], thisData[1][1], 0, 1)}
 							)
 						},
 					);
@@ -278,7 +286,7 @@ PopUpMenu(gui, Rect.new(842, 170, 35, 28)).font_(guiFont.pixelSize_(15))
 				.stringColor_(Color.green).background_(Color.black)
 			.action_({arg text;
 				buttons[\play].valueAction_(0);
-				params.put(\size, text);
+				params.put(\size, text.item);
 				this.initSynths;
 			}).valueAction_("3"));
 		};
