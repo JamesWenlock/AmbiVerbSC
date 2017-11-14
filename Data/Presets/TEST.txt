@@ -7,7 +7,7 @@ p = [
 	0, [ array: o[1],  size: 16 ],  
 	// Array
 	1, [ nil,  nil,  nil,  nil,  
-		'coupAmt',  2.5780408861022,  nil,  nil,  
+		'coupAmt',  0.31415926535898,  nil,  nil,  
 		nil,  nil,  'crossoverFreq',  1216.4605801246,  
 		nil,  nil,  'phaseRotRate',  0.24326229669597,  
 		'size',  o[2],  'dispersion',  0.88,  
@@ -15,7 +15,7 @@ p = [
 		'phaseRotMix',  1,  'modRate',  0.12945001209852,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
-		'phaseRotAmt',  6.2831853071796,  'lowRT',  4.4056,  
+		'phaseRotAmt',  1.3194689145077,  'lowRT',  4.4056,  
 		'orient',  'flu',  'spread',  0.81,  
 		nil,  nil,  'mix',  0.55,  
 		nil,  nil,  nil,  nil,  
