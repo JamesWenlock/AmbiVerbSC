@@ -1,0 +1,26 @@
+var o, p;
+o = [
+	Dictionary.prNew,  Array.prNew(64),  "cubeXS"
+];
+p = [
+	// Dictionary
+	0, [ array: o[1],  size: 16 ],  
+	// Array
+	1, [ nil,  nil,  nil,  nil,  
+		'coupAmt',  6.2831853071796,  nil,  nil,  
+		nil,  nil,  'crossoverFreq',  1216.4605801246,  
+		nil,  nil,  'phaseRotRate',  0.075857757502918,  
+		'size',  o[2],  'dispersion',  0.08,  
+		nil,  nil,  nil,  nil,  
+		'phaseRotMix',  1,  'modRate',  0.073058441144325,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'phaseRotAmt',  4.2097341558103,  'lowRT',  7.2028,  
+		'orient',  'flu',  'spread',  0.75,  
+		nil,  nil,  'mix',  1,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'preDelay',  0,  
+		nil,  nil,  'highRT',  1.3087,  
+		'coupRate',  0.075857757502918,  'modWidth',  0.12 ]
+];
+prUnarchive(o,p);

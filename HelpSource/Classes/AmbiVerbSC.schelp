@@ -5,6 +5,10 @@ categories:: Ambisonics
 DESCRIPTION::
 An ambisonic tank reverb with coupling. See link::Tutorials/AmbiVerbTutorial::.
 
+warning::
+A SynthDef can only have two LocalIn/LocalOut pairings — one for control rate and one for audio rate. AmbiVerbSC uses local in and out! Note that AmbiVerbSC's internal feedback loop could interfere with other feedback loops. Use addition LocalIns and Outs with caution!
+::
+
 CLASSMETHODS::
 
 METHOD:: ar
