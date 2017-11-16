@@ -5,7 +5,7 @@ section:: Overview
 
 Ambisonics is an audio technique that allows for precise production, manipulation, and playback of full sphere surround sound. For the most part this method has been limited to academic circles, but recent advances in computing, software, and Virtual Reality (VR) have made Ambisonics more accessible and applicable than ever before. Although these developments are exciting, the amount effects designed for this audio methodology is minuscule in comparison to traditional audio environments.
 
-The purpose of AmbiVerbSC is to explore the Ambisonic implementation of traditional digital audio effects by creating an Ambisonic reverberator. The algorithm is comprised of a delay-line cascade that is fed back into itself forming a feedback loop. Inside this loop, the summation of these delays is transformed in space over time to create a rich three dimensional spatial image. This tutorial will cover implementation and a few creative applications of this structure.
+The purpose of AmbiVerbSC is to explore the Ambisonic implementation of traditional digital audio effects by creating an Ambisonic reverberator. The algorithm is comprised of a delay-line cascade that is fed back into itself forming a feedback loop. Inside this loop, the summation of these delays are transformed in space over time to create a rich three dimensional spatial image. This tutorial will cover implementation and a few creative applications of this structure.
 
 image:: ambiverb.png#Figure 1 - AmbiVerbSC reverberator structure::
 
@@ -29,25 +29,25 @@ Image::t60equation.png::
 
 With a bit of algebra, any of the reverberator's parameters can be calculated so long as two are defined. For the allpass cascade, the two parameters we'll specify are a scaler value and delay times.
 
-The g value is set as the reciprocal of the golden ratio and multipled by scaler argument to allow for varying degrees of time dispersion (decay of each reverberator). This number is the same for all of our allpasses.
+The g value is set as the reciprocal of the golden ratio multipled by scaler argument. This scaler allows for varying degrees of time dispersion (decay of each reverberator). This number is the same for all of the allpasses contained in the cascade.
 
-Delay times calculated from the normal modes of a rectangular room using the following formula.
+Delay times are calculated from the normal modes of a rectangular room using the following formula.
 
 Image::Zolzer.png::
 
-To clarify, room modes can be defined as the collected standing waves of a room when a sound source is present. As sound reflects off the various surfaces of a space, certain frequencies are emphasized. The reciprocal of these values provides delay values directly related to the space.
+To clarify, room modes are defined as the collected standing waves of a room when a sound source is present. As sound reflects off the various surfaces of a space, certain frequencies are emphasized. The reciprocal of these values provides delay values directly related to the space.
 
-This equation is used recursively to compute a large number of modal frequency estimates. The reciprocal of these modal values are taken and sorted from largest to shortest resulting an array of usable delaytimes that are accurate to our initial room dimensions.
+This equation is used recursively to compute a large number of modal frequency estimates from the dimensions of a specified rectangular room. The reciprocal of these modal values are taken and sorted from largest to shortest resulting an array of usable delaytimes that are accurate to our initial room.
 
-We can now plug these values into our initial formula to get the parameters needed for link::Classes/AllpassL ::.
+We can now plug these values into our reverberator formula to get the parameters needed for link::Classes/AllpassL ::.
 
-The final piece of the allpass puzzle is delay-line modulation. This simulates the imperfections of a room and blurs resonances making the tank sound more realistic. Modulation is acheived using individual link::Classes/LFNoise2:: ugens for each allpass. The amount of modulation is controlled using a width argument with width corrisponding to a scaler of the smallest delay time in the cascade. The rate is universal for each allpass.
+The final piece of the allpass puzzle is delay-line modulation. This simulates the imperfections of a room and blurs resonances making the tank sound more realistic. Modulation is acheived using individual link::Classes/LFDNoise3:: ugens for each allpass. The amount of modulation is controlled using a width argument with width corrisponding to a scaler of the smallest delay time in the cascade. The rate is universal for each allpass.
 
 subsection:: Feedback Loop
 
 The Feedback Loop delays and scales the summation of our allpass cascade. This operation is similar to our individual reverberators and contains the same parameters. Thus, we can use the same equation to derive predictible values for our larger feedback loop. In this instance we'll be specifying a single delay-time and two decay values (this will be elaborated upon in the shelf filter section).
 
-The delay-time is determined by summing the average delays of the reverberators inside the cascade and adding an additional delay. This value is than scaled by a spread argument to allow for control over the amount the allpass is fed through the feedback loop.
+The delay-time is determined by summing the average delays of the reverberators inside the cascade and adding an additional delay. This value is than scaled by a spread argument to allow for control over the amount of times the cascade is fed through the feedback loop.
 
 subsection:: Shelf Filters
 
@@ -57,6 +57,9 @@ Rather than multiplying this signal by a single coefficient (as we did with the 
 
 Image:: math.png::
 
+note::
+These equation allows decay time to stay consistant regardless of spread.
+::
 
 section:: Conversion to Ambisonic
 
@@ -67,7 +70,7 @@ note::The majority of spatial manipulation of the signal is done using the Ambis
 
 subsection:: Going From B to A
 
-The signal is initially Decoded to A-format which outputs 4 signals corrisponding to the vertices a tetrahedral in space. One of the best ways to make something sound spatial is to transform each of these signals in a similar yet different fashion. In AmbiVerbSC, this is accomplished by calculating 4 different arrays of delay times based off of rooms with nearly identical dimensions. This corrisponds to 4 related monophonic reverberators which our A-format signal is sent through. With delay-time modulation this creates a strong foundation for a rich spatial image.
+The signal is initially Decoded to A-format which outputs 4 signals corrisponding to the vertices a tetrahedran in space. One of the best ways to make something sound spatial is to transform each of these signals in a similar yet different fashion. In AmbiVerbSC, this is accomplished by calculating 4 different arrays of delay times based off of rooms with nearly identical dimensions. This corrisponds to 4 related monophonic reverberators which our A-format signal is sent through. With delay-time modulation, this creates a strong foundation for a rich spatial image.
 
 SuperCollider makes this process easy with multichannel expansion. As long as the delay time arrays are manipulated properly, the A-format signal can be sent through the same code used for the monophonic reverb with no hiccups.
 
@@ -81,13 +84,13 @@ Once our A-format signal has been reverberated, delayed, and scaled, it is conve
 
 subsection:: Coupling
 
-Still in B-format, the signal is then coupled. Coupling mixes the signals in space using a matrix. This allows for varying degrees of A-Format signal to pass through all of the reverberators rather than being fixed at a tetrahedral point. This mixing is implemented using the ATK's link::Classes/FoaRTT:: which is modulated with a series of link::Classes/LFNoise2::. This transformed signal is then converted back to A-format and sent again through the loop.
+Still in B-format, the signal is then coupled. Coupling mixes the signals in space using a matrix. This allows for varying degrees of the A-Format signal to pass through all of the reverberators rather than being fixed at a tetrahedral point. This mixing is implemented using the ATK's link::Classes/FoaRTT:: which is modulated with a series of link::Classes/LFNoise2::. This transformed signal is then converted back to A-format and sent again through the loop.
 
 section:: AmbiVerbGUI
 
 image::ambiverbgui.png#Figure 7::
 
-The AmbiVerbGUI was designed for easy exploration and experimentation of AmbiVerbSC. This section will go over the elements of the interface and some creative applications of its parameters.
+The AmbiVerbGUI iss designed for easy exploration and experimentation of AmbiVerbSC. This section will go over the elements of the interface and some creative applications of its parameters.
 
 For descriptions of parameters, see link::Classes/AmbiVerbSC::
 
@@ -99,80 +102,42 @@ subsection:: Interface
 
 (3) strong::SoundFile:: - Selects B-Format files AmbiVerbGUI will play. Loops until stopped. Samples can be changed and added to by altering the sample folder inside of AmbiVerbSC's file location
 
-(4) strong::Gain:: - Changes gain of AmbiVerbGUI's output. Gain ranges from -inf to 6 decibles.
+(4) strong::Save Preset: - Allows user to save currently selected parameters as a preset
 
-(5) strong::Control:: - Dictates general parameters. number at top left indicates value of the paramater most recently manipulated.
+(5) strong::Load Preset: - Selects and loads preset with given
 
-(5) strong::Spatial Diffusion:: - Dictates spatial dispersion parameters. Left number holds same function as control. For orientation, see link::Classes/FoaDecoderMatrix#newBtoA:: for list of tetrahedral positions
+(6) strong::Gain:: - Changes gain of AmbiVerbGUI's output. Gain ranges from -inf to 6 decibles.
+
+(7) strong::Control:: - Dictates general parameters. number at top left indicates value of the paramater most recently manipulated.
+
+(8) strong::Spatial Diffusion:: - Dictates spatial dispersion parameters. Left number holds same function as control. For orientation, see link::Classes/FoaDecoderMatrix#newBtoA:: for list of tetrahedral positions
 
 note:: Hilbert and coup amounts specified as degree values from 0 to 360::
 
-(6) strong::Time Diffusion:: - Dictates parameters for diffusion in time.
+(9) strong::Time Diffusion:: - Dictates parameters for diffusion in time.
 
 note:: Size and orientation parameters will stop the current sound when changed::
 
 subsection:: Application
 
-Below are some preset parameter listings that showcase some of the many interesting effects that can be acheived with AmbiVerbSC
+Below are descriptions of AmbiVerbSC's presets showcasing some of the many interesting effects that can be acheived with AmbiVerbSC
 
-Strong::Natural Reverb:: - Subtle reverb similar to a large room. Full dispersion, resonable ring times, subtle modulation, and light mix.
-List::
-##mix = 0.41
-##preDelay = 0
-##crossover = 735.83
-##lowRT = 6
-##highRT = 1.52
-##orientation = flu
-##coupRate = 0.85
-##coupAmt = 360
-##hilbertRate = 0.23
-##hilbertAmt = -360
-##size = 7
-##dispersion = 1
-##spread =  1
-##modWidth = 0.1
-##modRate = 0.34
-::
+Strong::default :: -  A template for creating your own presets. Mix, ring time set to zero. Full dispersion and spread. No spatial or time modulation.
 
-Strong::Lots of Echos:: - Dense echoing clusters,  quite chaotic. No time dispersion, small spread, moderately high ringtimes, subtle modulation.
+Strong::high verb:: - Reverb with no low end. Large highRT with full dispersion and subtle modulation.
 
-List::
-##mix = 0.77
-##preDelay = 0.13
-##crossover = 800
-##lowRT = 8.4
-##highRT = 6.28
-##orientation = flu
-##coupRate = 3.77
-##coupAmt = 360
-##hilbertRate = 3.02
-##hilbertAmt = -360
-##size = 7
-##dispersion = 0
-##spread =  0.18
-##modWidth = 0.11
-##modRate = 0.5
-::
+Strong::huge hall:: - Massive reverb larger most real spaces. Full dispersion, excessive ring times, subtle modulation, and medium mix.
 
-Strong::Wild Modulation:: - Warped reimaginings of the source. High ring times with aggresive spatial and time modulation.
+Strong::large hall:: - Subtle reverb similar to a large hall. Full dispersion, moderate ring times, subtle modulation, and ligth mix.
 
-List::
-##mix = 0.94
-##preDelay = 1
-##crossover = 2735.83
-##lowRT = 8
-##highRT = 9
-##orientation = flr
-##coupRate = 9.87
-##coupAmt = 360
-##hilbertRate = 9.92
-##hilbertAmt = -360
-##size = 10
-##dispersion = 0.74
-##spread =  0.4
-##modWidth = 1
-##modRate = 10
-::
+Strong::low verb:: - Reverb with no high end. Large lowRT with full dispersion and subtle modulation.
+
+Strong::mod echo:: - Dense pitch shifting echoing clusters, quite chaotic. Low time dispersion, small spread, moderate ringtimes, moderate spatial and time modulation.
+
+Strong::spatial delay:: - Delay similar to tape echo. Low time dispersion, small spread, moderate ringtimes, subtle time and spatial modulation.
+
+Strong::time modulation:: - Warped reimaginings of the source. High ring times with aggresive spatial and time modulation.
+
 
 section:: Conclusion
 

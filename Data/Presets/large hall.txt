@@ -1,0 +1,26 @@
+var o, p;
+o = [
+	Dictionary.prNew,  Array.prNew(64),  "shoeboxXL"
+];
+p = [
+	// Dictionary
+	0, [ array: o[1],  size: 16 ],  
+	// Array
+	1, [ nil,  nil,  nil,  nil,  
+		'coupAmt',  5.4663712172462,  nil,  nil,  
+		nil,  nil,  'crossoverFreq',  1216.4605801246,  
+		nil,  nil,  'phaseRotRate',  0.075857757502918,  
+		'size',  o[2],  'dispersion',  1,  
+		nil,  nil,  nil,  nil,  
+		'phaseRotMix',  1,  'modRate',  0.073058441144325,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		'phaseRotAmt',  4.2097341558103,  'lowRT',  5.1049,  
+		'orient',  'flu',  'spread',  0.64,  
+		nil,  nil,  'mix',  0.52,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'preDelay',  0,  
+		nil,  nil,  'highRT',  1.7083,  
+		'coupRate',  0.063095734448019,  'modWidth',  0.12 ]
+];
+prUnarchive(o,p);

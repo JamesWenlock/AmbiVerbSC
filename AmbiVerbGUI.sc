@@ -288,7 +288,7 @@ PopUpMenu(gui, Rect.new(842, 170, 35, 28)).font_(guiFont.pixelSize_(15))
 				buttons[\play].valueAction_(0);
 				params.put(\size, text.item);
 				this.initSynths;
-			}).valueAction_("3"));
+			}));
 		};
 
 		// Creates knob that dictates master gain
@@ -372,7 +372,8 @@ PopUpMenu(gui, Rect.new(842, 170, 35, 28)).font_(guiFont.pixelSize_(15))
 				});
 				buildParamViews.value();
 			    createSizeParam.value();
-			    makeOrientMenu.value();
+				paramViews[\sizeParam].valueAction_(paramViews[\sizeParam].items.collect({arg thisItem; thisItem.asSymbol}).indexOf(params[\size].asSymbol));
+				makeOrientMenu.value();
 			});
 
 			Button(gui, Rect.new(255 + 125 + 10, 80 - 30 - 5, 125, 30)).states_(
