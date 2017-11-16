@@ -14,6 +14,28 @@ Center for Digital Arts and Experimental Media, University of Washington - https
 */
 
 AmbiVerbSC {
+    classvar <>dataDir;
+
+    *setDataDir {
+        block { |break|
+            // look in downloaded quarks
+            [
+                Platform.userAppSupportDir +/+ "downloaded-quarks",
+                Platform.systemAppSupportDir +/+ "downloaded-quarks",
+                Platform.userExtensionDir,
+                Platform.systemExtensionDir
+            ].do{ |suppDir|
+                var test = suppDir +/+ "AmbiVerbSC/Data";
+                if (File.exists(test)) {
+                    dataDir = test;
+                    break.()
+                };
+            };
+        };
+        dataDir ?? {
+            "AmbiVerbSC: couldn't find Data directory in Extensions or downloaded-quarks directory".throw;
+        }
+    }
 
 	*ar {
 		arg in, mix = 1, preDelay = 0, crossoverFreq = 3000,
@@ -41,9 +63,11 @@ AmbiVerbSC {
 		var phaseRotRates, coupRates, coupMod;
 		var lagMul;
 
+        // init data directory
+        dataDir ?? {this.class.setDataDir};
+
 		// Defines lag multiplier for LFNoises
 		lagMul = (2 / (1 + sqrt(5))).reciprocal * 1.5;
-
 
 		// # of allpasses in second cascade
 		apTwoLength = 2;
@@ -69,7 +93,7 @@ AmbiVerbSC {
 		phaseRotRates = phaseRotRate + {rrand(phaseRotVar[0], phaseRotVar[1])}!4;
 
 		// Reads delay times from Data folder
-		dTs =  Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/DelayTimes/" ++ size ++ ".txt");
+        dTs =  Object.readArchive(dataDir +/+ format("DelayTimes/%.txt", size));
 
 		// Calculates decay times
 		decTs = -3 * dTs / (log10(g * dispersion));
