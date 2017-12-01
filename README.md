@@ -53,5 +53,6 @@ A description of AmbiVerbSC's inner workings can be found on the AmbiVerbSC tuto
 * I would like to personally thank
     * **Dr.Joseph Anderson** for taking me on this quater. Acting as my mentor this quater, he taught me everything I know now about ambisonics, as well as a bunch of other things! He's absolutely brilliant and I'm so grateful for all the time, flexibility, resources and expertise. This project would not have happened without him!
     * **Dan Peterson** for all the help! He's debugged my code, helped me develop new techniques, as well as be a fantastic teacher throughout my sonic studies. This project would not have happened without him!
-    * **Dr.Juan Pampin** for meeting with me throughtout the year, creating an incredible for education, and helping me reach my rather ambitious goals. Thanks so much for the incredible resources and opportunities  
+    * **Dr.Juan Pampin** for meeting with me throughtout the year and helping me reach my rather ambitious goals. Thanks so much for the incredible resources and opportunities  
     * **Dr.Ewa Trębacz** for getting me started in the labs and helping me get the resources needed to execute this project. I appreciate the time and thought!
+    * **Michael McCrea** for the support in code and troubleshooting throughout this project. I apprecaite the merges and talking shop! Thank you!
