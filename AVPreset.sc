@@ -14,6 +14,7 @@ Center for Digital Arts and Experimental Media, University of Washington - https
 */
 
 AVPreset {
+    var presetDir;
 
 	// Creates new instance of AmbiverbGUI
 	*new {
@@ -21,11 +22,14 @@ AVPreset {
 	}
 
 	init {
+        // init data directory
+        AmbiVerbSC.dataDir ?? {AmbiVerbSC.setDataDir};
+        presetDir = AmbiVerbSC.dataDir +/+ "Presets";
 	}
 
 	write {arg name, params;
 
-		var paramDict = Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/default.txt");
+        var paramDict = Object.readArchive(presetDir +/+ "default.txt");
 
 		params.do({arg thisData;
 			paramDict.put(thisData[0], thisData[1]);
@@ -35,12 +39,12 @@ AVPreset {
 	}
 
 	writeDict {arg name, dict;
-		dict.writeArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/" ++ name  ++ ".txt");
+        dict.writeArchive(presetDir +/+ format("%.txt", name));
 	}
 
 
 	read {arg preset, params;
-		var paramDict = Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/" ++ preset.asString ++ ".txt");
+        var paramDict = Object.readArchive(presetDir +/+ format("%.txt", preset.asString));
 
 		params.do({arg thisData;
 			paramDict.put(thisData[0], thisData[1])
@@ -50,7 +54,7 @@ AVPreset {
 	}
 
 	list {
-		var presetPaths = PathName(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets").entries;
+		var presetPaths = PathName(presetDir).entries;
 		var names;
 
 		names = presetPaths.collect({arg path;

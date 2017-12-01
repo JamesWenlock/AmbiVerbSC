@@ -31,6 +31,8 @@ AmbiVerbGUI {
 
 	// Initiallizes AmbiverbGUI
 	init {arg thisServer;
+        // init data directory
+        AmbiVerbSC.dataDir ?? {AmbiVerbSC.setDataDir};
 
 		// Sets server
 		server = thisServer;
@@ -273,7 +275,7 @@ AmbiVerbGUI {
 			var sizeNames;
 
 			sizeNames = Array.new;
-			sizePaths = PathName(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/DelayTimes").entries;
+            sizePaths = PathName(AmbiVerbSC.dataDir +/+ "DelayTimes").entries;
 
 			sizePaths.do({arg path;
 				var thisPath = path.fileName.split(separator: $.);
