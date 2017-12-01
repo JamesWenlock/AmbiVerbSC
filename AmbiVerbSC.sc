@@ -17,8 +17,8 @@ AmbiVerbSC {
 
 	*ar {
 		arg in, mix = 1, preDelay = 0, crossoverFreq = 3000,
-		lowRT = 10, highRT = 7, dispersion = 1, size = 7,
-		timeModWidth = 0.2, timeModRate = 0.3, coupRate = 0.5,
+		lowRT = 10, highRT = 7, dispersion = 1, size = "cubeS",
+		modWidth = 0.2, modRate = 0.3, coupRate = 0.5,
 		coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi,
 		orientation  = \flu, maxPreDelay = 10, feedbackSpread = 1;
 
@@ -103,9 +103,9 @@ AmbiVerbSC {
 
 		// First allpass
 		allPassData1.do({arg thisData;
-			var width = thisData[0] * timeModWidth.linlin(0, 1, widthRange[0], widthRange[1]) * 0.5;
+			var width = thisData[0] * modWidth.linlin(0, 1, widthRange[0], widthRange[1]) * 0.5;
 			var maxDelay = thisData[0] * 2;
-			var delay = thisData[0] + (LFDNoise3.ar(timeModRate)* width);
+			var delay = thisData[0] + (LFDNoise3.ar(modRate)* width);
 			sum = AllpassL.ar(sum, maxDelay, delay, thisData[1])
 		});
 
@@ -147,9 +147,9 @@ AmbiVerbSC {
 
 		// Second allpass cascade
 		allPassData2.do({arg thisData;
-			var width = (thisData[0] * timeModWidth.linlin(0, 1, widthRange[0], widthRange[1])) * 0.5;
+			var width = (thisData[0] * modWidth.linlin(0, 1, widthRange[0], widthRange[1])) * 0.5;
 			var maxDelay = thisData[0] * 2;
-			var delay = thisData[0] + (LFDNoise3.ar(timeModRate) * width);
+			var delay = thisData[0] + (LFDNoise3.ar(modRate) * width);
 			wet = AllpassL.ar(wet, maxDelay, delay,  thisData[1])
 		});
 
