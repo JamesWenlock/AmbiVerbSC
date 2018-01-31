@@ -1,10 +1,10 @@
 # AmbiVerbSC
 
-The AmbiVerbSC is a tank reverb quark with coupling. It was creating in collaboration  with Center for Digital Arts and Experimental Media at the University of Washington under Dr.Joseph Anderson.  
+The AmbiVerbSC is a tank reverb quark with coupling. It was creating in collaboration with the Center for Digital Arts and Experimental Media at the University of Washington under Dr.Joseph Anderson.  
 
 ### Prerequisites   
 * the [Ambsionic Toolkit](http://www.ambisonictoolkit.net/download/supercollider/) with [kernels](http://www.ambisonictoolkit.net/download/kernels/)
-* [SuperCollider 3.8.0](http://supercollider.github.io/download.html)
+* [SuperCollider 3.9.0](http://supercollider.github.io/download.html)
 
     
 ### Installing
@@ -26,7 +26,7 @@ A description of AmbiVerbSC's inner workings can be found on the AmbiVerbSC tuto
 
 ## Built With
 
-* [SuperCollider 3.8.0](http://www.dropwizard.io/1.0.2/docs/) - Audio synthesis platform 
+* [SuperCollider 3.9.0](http://supercollider.github.io/download) - Audio synthesis platform 
 * [Ambisonic Toolkit](http://www.ambisonictoolkit.net/) - Tools to convert and manipulate audio in 3D space
 
 ## Resources 
