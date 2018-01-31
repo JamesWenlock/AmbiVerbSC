@@ -1,10 +1,11 @@
 (
-	name: 		"AmbiVerbSC",
-	summary:	"Ambisonic tank reverb",
-    	schelp:     	"AmbiVerbSC",
-	author: 	"James Wenlock",
-  	license: 	"GPL",
-	version:	"1.1.0",
-	organization: "Center for Digital Arts and Experimental Media",
-    copyright: "James Wenlock, 2017"
+	\name: 		"AmbiVerbSC",
+	\summary:	"Ambisonic tank reverberator with coupling",
+    	\schelp:     	"AmbiVerbSC",
+	\author: 	"James Wenlock",
+  	\license: 	"GPL",
+	\version:	"1.0.0",
+	\dependencies:  ["atk-sc3"]
+	\organization: "Center for Digital Arts and Experimental Media",
+        \copyright:    "James Wenlock, 2017"
 )
