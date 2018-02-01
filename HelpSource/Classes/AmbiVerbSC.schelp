@@ -125,6 +125,99 @@ AmbiVerbGUI(s);
 ::
 
 code::
+// Example for rendering AmbiVerSC with presets using CTK  
+(
+var score, synths, buffer, path, paramDict, preset, sampleRate, sampleFormat, headerFormat;
+score = CtkScore.new;
+
+// Set path
+path = "/Users/dxlocal/Library/Application Support/ATK/sounds/b-format/Hodges-Purcell.wav";
+SoundFile.use(path, {arg soundFile;
+	sampleRate = soundFile.sampleRate;
+	sampleFormat = soundFile.sampleFormat;
+});
+headerFormat = 'WAV';
+buffer = CtkBuffer(path).addTo(score);
+
+// Select preset
+preset = nil;
+// preset = "high verb";
+
+// If nil select params
+preset.notNil.if({
+	paramDict = Object.readArchive(Platform.userAppSupportDir ++ "/downloaded-quarks/AmbiVerbSC/Data/Presets/" ++ preset.asString ++ ".txt");
+}, {
+	paramDict = Dictionary.newFrom([
+		'mix', 1.0,
+		'preDelay', 0,
+		'crossoverFreq', 3000,
+		'lowRT', 4.2,
+		'highRT', 1.2,
+		'dispersion', 1,
+		'size', 'cubeS',
+		'modWidth', 0.2,
+		'modRate', 0.5,
+		'coupRate', 0.5,
+		'coupAmt', 6pi,
+		'phaseRotRate', 0.4,
+		'phaseRotAmt', 2pi,
+		'orientation', 'flu',
+		'maxPreDelay', 10,
+		'feedbackSpread', 1
+	])
+});
+
+paramDict.postln;
+
+synths = CtkProtoNotes(
+	SynthDef('ambiverb', {
+		arg buffer, mix = 1, preDelay = 0, crossoverFreq = 3000,
+		lowRT = 10, highRT = 7, dispersion = 1,
+		modWidth = 0.2, modRate = 0.3, coupRate = 0.5,
+		coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi, feedbackSpread = 1;
+		var sig, reverb, size = paramDict['size'], orientation  = \flu;
+
+		sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer));
+
+		reverb = AmbiVerbSC.ar(sig, mix, 0, crossoverFreq,
+			lowRT, highRT, dispersion, size,
+			modWidth, modRate, coupRate,
+			coupAmt, phaseRotRate, phaseRotAmt,
+			orientation, 10, feedbackSpread);
+
+		Out.ar(0, reverb)
+	})
+);
+
+score.add(
+	synths['ambiverb'].note(0.0, buffer.duration + 10)
+	.buffer_(buffer)
+	.mix_(paramDict['mix'])
+	.preDelay_(paramDict['preDelay'])
+	.crossoverFreq_(paramDict['crossoverFreq'])
+	.lowRT_(paramDict['lowRT'])
+	.highRT_(paramDict['highRT'])
+	.dispersion_(paramDict['dispersion'])
+	.modWidth_(CtkControl.env(Env([0.1, paramDict['modWidth']], [buffer.duration], \sin)))
+	.modRate_(CtkControl.env(Env([0.1, paramDict['modRate']], [buffer.duration], \sin)))
+	.coupRate_(paramDict['coupRate'])
+	.coupAmt_(paramDict['coupAmt'])
+	.phaseRotRate_(paramDict['phaseRotRate'])
+	.phaseRotAmt_(paramDict['phaseRotAmt'])
+	.feedbackSpread_(paramDict['feedbackSpread'])
+);
+
+// IMPORTANT (enough memory must be allocated in order for score to render!!)
+score.write(
+	path.splitext[0] ++ preset ++ ".wav",
+	sampleFormat: sampleFormat,
+	headerFormat: headerFormat,
+	sampleRate: sampleRate,
+	options: ServerOptions.new.numOutputBusChannels_(4).memSize_(2**21)
+)
+)
+
+code::
 (
 // Adapted from B-format Sound File Binaural Decoder Code
 // Plays Default Ambiverb Decoded with a binaural (HRTF) decoder
