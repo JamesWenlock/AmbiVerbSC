@@ -64,7 +64,7 @@ AmbiVerbSC {
 		var lagMul;
 
         // init data directory
-        dataDir ?? {this.class.setDataDir};
+        dataDir ?? {this.setDataDir};
 
 		// Defines lag multiplier for LFNoises
 		lagMul = (2 / (1 + sqrt(5))).reciprocal * 1.5;
