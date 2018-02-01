@@ -55,4 +55,4 @@ A description of AmbiVerbSC's inner workings can be found on the AmbiVerbSC tuto
     * **Dan Peterson** for all the help! He's debugged my code, helped me develop new techniques, as well as be a fantastic teacher throughout my sonic studies. This project would not have happened without him!
     * **Dr.Juan Pampin** for meeting with me throughtout the year and helping me reach my rather ambitious goals. Thanks so much for the incredible resources and opportunities  
     * **Dr.Ewa Trębacz** for getting me started in the labs and helping me get the resources needed to execute this project. I appreciate the time and thought!
-    * **Michael McCrea** for the support in code and troubleshooting throughout this project. I apprecaite the merges and talking shop! Thank you!
+    * **Michael McCrea** for the support in code and troubleshooting throughout this project. I appreciate the merges and talking shop! Thank you!
