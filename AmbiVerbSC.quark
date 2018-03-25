@@ -8,5 +8,5 @@
 	\dependencies:  ["atk-sc3"],
 	\organization: "Center for Digital Arts and Experimental Media",
         \copyright:    "James Wenlock, 2017"
-	\ext_dependancy: "See installation instructions: http://www.ambisonictoolkit.net/download/supercollider/. SC3-plugins: https://github.com/supercollider/sc3-plugins. ATK Kernels: https://github.com/ambisonictoolkit/atk-kernels",
+	\ext_dependancy: "SC3-plugins: https://github.com/supercollider/sc3-plugins. ATK Kernels: https://github.com/ambisonictoolkit/atk-kernels",
 )
