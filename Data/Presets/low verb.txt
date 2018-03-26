@@ -1,6 +1,6 @@
 var o, p;
 o = [
-	Dictionary.prNew,  Array.prNew(64),  "cubeS"
+	Dictionary.prNew,  Array.prNew(64),  "Metallener Saal"
 ];
 p = [
 	// Dictionary
@@ -10,7 +10,7 @@ p = [
 		'coupAmt',  5.7176986295334,  nil,  nil,  
 		nil,  nil,  'crossoverFreq',  421.79171025206,  
 		nil,  nil,  'phaseRotRate',  0.075857757502918,  
-		'size',  o[2],  'dispersion',  0,  
+		'size',  o[2],  'dispersion',  1,  
 		nil,  nil,  nil,  nil,  
 		'phaseRotMix',  1,  'modRate',  0.19747203516938,  
 		nil,  nil,  nil,  nil,  

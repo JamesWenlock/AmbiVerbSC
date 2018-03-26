@@ -1,6 +1,6 @@
 var o, p;
 o = [
-	Dictionary.prNew,  Array.prNew(64),  "cubeS"
+	Dictionary.prNew,  Array.prNew(64),  "Brahmssaal"
 ];
 p = [
 	// Dictionary

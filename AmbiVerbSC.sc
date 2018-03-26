@@ -1,7 +1,6 @@
 /*
 <AmbiVerbSC - James Wenlock>
 Center for Digital Arts and Experimental Media, University of Washington - https://dxarts.washington.edu/
-
    Copyright (C) <2017>  <James Wenlock>
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,7 +60,7 @@ AmbiVerbSC {
 		var spreadRange, widthRange;
 		var phaseRotVar, coupRateVar;
 		var phaseRotRates, coupRates, coupMod;
-		var lagMul;
+		var lagMul, feedback;
 
         // init data directory
         dataDir ?? {this.setDataDir};
@@ -93,24 +92,26 @@ AmbiVerbSC {
 		phaseRotRates = phaseRotRate + {rrand(phaseRotVar[0], phaseRotVar[1])}!4;
 
 		// Reads delay times from Data folder
-        dTs =  Object.readArchive(dataDir +/+ format("DelayTimes/%.txt", size));
+        dTs =  Object.readArchive(dataDir +/+ format("DelayTimes/%.txt", size)) * 0.5;
 
 		// Calculates decay times
 		decTs = -3 * dTs / (log10(g * dispersion));
 
-		// Sums delays for feedback delay calculations
-		dTs.flop.do({arg theseDts;
-		   delaySum = delaySum.add(theseDts.sum);
-		});
+		// delaySum = Array.newClear(4);
+		// // Sums delays for feedback delay calculations
+		// dTs.do({arg theseDts, i;
+		// 	delaySum[i] = theseDts.sum;
+		// });
 
 		// Calculates feedback delay time
-		maxFeedbackDelay = delaySum + dTs[0] - ControlDur.ir;
+		maxFeedbackDelay = dTs[0].sum + dTs.flop[5];
 		feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, spreadRange[0], spreadRange[1]);
 
 		// Calculates g values for low and high shelf filters
 		lowG  = 10**(-3 * (feedbackDelay) / lowRT);
 		highG = 10**(-3 * (feedbackDelay) / highRT);
-
+		dTs = dTs.flop;
+		decTs = decTs.flop;
 		// Gets data from delay and decay times for first allpass cascade
 		allPassData1 = [dTs, decTs].flop;
 
@@ -133,11 +134,9 @@ AmbiVerbSC {
 			sum = AllpassL.ar(sum, maxDelay, delay, thisData[1])
 		});
 
-		// Delay for feedback
-		wet = DelayL.ar(sum, maxFeedbackDelay, feedbackDelay);
 
 		// High pass to prevent DC Build-up
-		wet = HPF.ar(wet, hPFreq);
+		wet = HPF.ar(sum, hPFreq);
 
 		// Creates and scales low and high shelf by specified g-value
 		low = LPF.ar(wet, crossoverFreq);
@@ -163,11 +162,14 @@ AmbiVerbSC {
 
 		wet = FoaDecode.ar(wet, FoaDecoderMatrix.newBtoA);
 
+		// Delay for feedback
+		feedback = DelayL.ar(wet, maxFeedbackDelay, feedbackDelay);
+
 		// Sends signal back through loop
-		LocalOut.ar(wet);
+		LocalOut.ar(feedback);
 
 		// Delay to compensate for block size
-		wet = DelayN.ar(wet, ControlRate.ir.reciprocal, ControlRate.ir.reciprocal);
+//		wet = DelayN.ar(wet, ControlRate.ir.reciprocal, ControlRate.ir.reciprocal);
 
 		// Second allpass cascade
 		allPassData2.do({arg thisData;
