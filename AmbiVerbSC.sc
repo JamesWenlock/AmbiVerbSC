@@ -38,7 +38,7 @@ AmbiVerbSC {
 
 	*ar {
 		arg in, mix = 1, preDelay = 0, crossoverFreq = 3000,
-		lowRT = 10, highRT = 7, dispersion = 1, size = "cubeS",
+		lowRT = 10, highRT = 7, dispersion = 1, size = "Brahmssaal",
 		modWidth = 0.2, modRate = 0.3, coupRate = 0.5,
 		coupAmt = 6pi, phaseRotRate = 0.4, phaseRotAmt = 2pi,
 		orientation  = \flu, maxPreDelay = 10, feedbackSpread = 1;
