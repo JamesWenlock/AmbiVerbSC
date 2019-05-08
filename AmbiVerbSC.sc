@@ -64,7 +64,7 @@ AmbiVerbSC {
 		var tempAllPassData;
 		var delayData;
 		var coeff;
-		var chunkSum;
+		var cascadeFunc;
 
         // init data directory
         dataDir ?? {this.setDataDir};
@@ -77,7 +77,7 @@ AmbiVerbSC {
 
 		// g value = 1 /  golden ratio
 		coeff = {2 / (1 + sqrt(5))}!3;
-		g = 0.874;
+		g = 0.678;
 
 		// Highpass filter frequency
 		hPFreq = 20;
@@ -102,12 +102,6 @@ AmbiVerbSC {
 		// Calculates decay times
 		decTs = -3 * dTs / (log10(g * dispersion));
 
-		// delaySum = Array.newClear(4);
-		// // Sums delays for feedback delay calculations
-		// dTs.do({arg theseDts, i;
-		// 	delaySum[i] = theseDts.sum;
-		// });
-
 		// Calculates feedback delay time
 		maxFeedbackDelay = dTs[0].sum + dTs.flop[5];
 		feedbackDelay = maxFeedbackDelay * feedbackSpread.linlin(0, 1, spreadRange[0], spreadRange[1]);
@@ -128,19 +122,21 @@ AmbiVerbSC {
 			allPassData1[i];
 		});
 
-		allPassData1 = [
-			[[allPassData1[0], allPassData1[1]], delayData[0], coeff[0]],
-			[[allPassData1[2], allPassData1[3]], delayData[1], coeff[1]],
-			[[allPassData1[3], allPassData1[4]], delayData[2], coeff[2]]
-		];
-
 		// Decodes B-format signal, sets dry value to initial signal
 		dry = FoaDecode.ar(in, FoaDecoderMatrix.newBtoA(orientation));
 
 		// Sums dry signal with feedback from allpass chain
 		sum =  dry + LocalIn.ar(4);
-		chunkSum = sum;
 
+		sum = HPF.ar(sum, 20);
+
+		allPassData1.do({arg thisData;
+			var width = (thisData[0] * modWidth.linlin(0, 1, widthRange[0], widthRange[1])) * 0.5;
+			var maxDelay = thisData[0] * 2;
+			var delay = thisData[0] + (LFDNoise3.ar(modRate) * width);
+			sum = AllpassL.ar(sum, maxDelay, delay,  thisData[1])
+		});
+/*
 		// First allpass
 		allPassData1.do({arg allPassChunk;
 		    var chunkSum;
@@ -154,6 +150,7 @@ AmbiVerbSC {
 			sum = DelayL.ar(sum, maxFeedbackDelay, allPassChunk[1]);
 			sum = sum + (chunkSum * allPassChunk[2]);
 		});
+		*/
 
 		// High pass to prevent DC Build-up
 		wet = HPF.ar(sum, hPFreq);
@@ -182,8 +179,8 @@ AmbiVerbSC {
 
 		wet = FoaDecode.ar(wet, FoaDecoderMatrix.newBtoA);
 
-/*		// Delay for feedback
-		feedback = DelayL.ar(wet, maxFeedbackDelay, feedbackDelay);*/
+		// Delay for feedback
+		feedback = DelayL.ar(wet, maxFeedbackDelay, feedbackDelay);
 
 		// Sends signal back through loop
 		LocalOut.ar(feedback);
@@ -196,7 +193,7 @@ AmbiVerbSC {
 			var width = (thisData[0] * modWidth.linlin(0, 1, widthRange[0], widthRange[1])) * 0.5;
 			var maxDelay = thisData[0] * 2;
 			var delay = thisData[0] + (LFDNoise3.ar(modRate) * width);
-			sum = AllpassL.ar(sum, maxDelay, delay,  thisData[1])
+			sum = AllpassL.ar(sum, maxDelay, delay, thisData[1])
 		});
 
 		// Pre-delay
