@@ -49,7 +49,7 @@ A description of AmbiVerbSC's inner workings can be found on the AmbiVerbSC tuto
 
 ## Acknowledgments
 
-* This project would not have been possible without the guidence, generosity and support University of Washington's Digital Arts deparment.
+* This project would not have been possible without the guidence, generosity and support from University of Washington's Digital Arts deparment.
 * I would like to personally thank
     * **Dr.Joseph Anderson** for taking me on this quater. Acting as my mentor this quater, he taught me everything I know now about ambisonics, as well as a bunch of other things! He's absolutely brilliant and I'm so grateful for all the time, flexibility, resources and expertise. This project would not have happened without him!
     * **Dan Peterson** for all the help! He's debugged my code, helped me develop new techniques, as well as be a fantastic teacher throughout my sonic studies. This project would not have happened without him!
