@@ -16,24 +16,11 @@ AmbiVerbSC {
     classvar <>dataDir;
 
     *setDataDir {
-        block { |break|
-            // look in downloaded quarks
-            [
-                Platform.userAppSupportDir +/+ "downloaded-quarks",
-                Platform.systemAppSupportDir +/+ "downloaded-quarks",
-                Platform.userExtensionDir,
-                Platform.systemExtensionDir
-            ].do{ |suppDir|
-                var test = suppDir +/+ "AmbiVerbSC/Data";
-                if (File.exists(test)) {
-                    dataDir = test;
-                    break.()
-                };
-            };
-        };
-        dataDir ?? {
-            "AmbiVerbSC: couldn't find Data directory in Extensions or downloaded-quarks directory".throw;
-        }
+		dataDir = File.realpath(this.class.filenameSymbol).dirname +/+ "Data";
+		if (File.exists(dataDir).not) {
+			dataDir = nil;
+			"AmbiVerbSC: couldn't find Data directory".throw;
+		};
     }
 
 	*ar {
