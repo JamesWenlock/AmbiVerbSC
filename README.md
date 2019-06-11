@@ -1,6 +1,6 @@
 # AmbiVerbSC
 
-The AmbiVerbSC is a tank reverb quark with coupling. It was creating in collaboration with the Center for Digital Arts and Experimental Media at the University of Washington under Dr.Joseph Anderson.  
+The AmbiVerbSC is a tank reverb quark with coupling. It was creating in collaboration with the [Center for Digital Arts and Experimental Media](https://dxarts.washington.edu/) at the University of Washington under Dr. Joseph Anderson.  
 
 ### Prerequisites   
 * the [Ambsionic Toolkit](http://www.ambisonictoolkit.net/download/supercollider/) with [kernels](http://www.ambisonictoolkit.net/download/kernels/)
@@ -9,8 +9,8 @@ The AmbiVerbSC is a tank reverb quark with coupling. It was creating in collabor
     
 ### Installing
 
-AmbiVerbSC can be installed using the Quarks gui in supercollier.
-*  Here's some more information on quarks and how to use them --> [Quarks Help](http://doc.sccode.org/Guides/UsingQuarks.html)
+AmbiVerbSC can be installed using the Quarks GUI in SuperCollider.
+* Here's some more information on quarks and how to use them --> [Quarks Help](http://doc.sccode.org/Guides/UsingQuarks.html)
 
 ## Getting Started
 
@@ -22,7 +22,7 @@ AmbiVerbGUI(s);
 
 A description of AmbiVerbSC's inner workings can be found on the AmbiVerbSC tutorial page in the help browser. Parameter details can be found in the class help file. 
 
-[Click this link](http://doc.sccode.org/Tutorials/Mark_Polishook_tutorial/04_Help.html) for more information on SuperCollider Help
+[Follow this link](http://doc.sccode.org/Tutorials/Mark_Polishook_tutorial/04_Help.html) for more information on SuperCollider Help
 
 ## Built With
 
@@ -49,10 +49,10 @@ A description of AmbiVerbSC's inner workings can be found on the AmbiVerbSC tuto
 
 ## Acknowledgments
 
-* This project would not have been possible without the guidence, generosity and support from University of Washington's Digital Arts deparment.
+* This project would not have been possible without the guidence, generosity and support from University of Washington's Center for Digital Arts and Experimental Media.
 * I would like to personally thank
-    * **Dr.Joseph Anderson** for taking me on this quater. Acting as my mentor this quater, he taught me everything I know now about ambisonics, as well as a bunch of other things! He's absolutely brilliant and I'm so grateful for all the time, flexibility, resources and expertise. This project would not have happened without him!
+    * **Dr. Joseph Anderson** for taking me on this quater. Acting as my mentor this quater, he taught me everything I know now about ambisonics, as well as a bunch of other things! He's absolutely brilliant and I'm so grateful for all the time, flexibility, resources and expertise. This project would not have happened without him!
     * **Dan Peterson** for all the help! He's debugged my code, helped me develop new techniques, as well as be a fantastic teacher throughout my sonic studies. This project would not have happened without him!
-    * **Dr.Juan Pampin** for meeting with me throughtout the year and helping me reach my rather ambitious goals. Thanks so much for the incredible resources and opportunities  
-    * **Dr.Ewa Trębacz** for getting me started in the labs and helping me get the resources needed to execute this project. I appreciate the time and thought!
+    * **Dr. Juan Pampin** for meeting with me throughtout the year and helping me reach my rather ambitious goals. Thanks so much for the incredible resources and opportunities  
+    * **Dr. Ewa Trębacz** for getting me started in the labs and helping me get the resources needed to execute this project. I appreciate the time and thought!
     * **Michael McCrea** for the support in code and troubleshooting throughout this project. I appreciate the merges and talking shop! Thank you!
