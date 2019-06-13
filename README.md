@@ -11,7 +11,7 @@ The AmbiVerbSC is a tank reverb quark with coupling. It was creating in collabor
 
 AmbiVerbSC can be installed using the Quarks manager in SuperCollider.
 ```
-Quarks.install(https://github.com/JamesWenlock/AmbiVerbSC);
+Quarks.install("https://github.com/JamesWenlock/AmbiVerbSC");
 ```
 * Here's some more information on quarks and how to use them --> [Quarks Help](http://doc.sccode.org/Guides/UsingQuarks.html)
 
