@@ -157,7 +157,7 @@ AmbiVerbSC {
 		wet = FoaRTT.ar(wet, coupMod[0], coupMod[1], coupMod[2]);
 
 		// Applies hilbert phase rotation
-		newLFMod = LFDNoise3.kr(phaseRotRates) * phaseRotAmt;
+		newLFMod = K2A.ar(LFDNoise3.kr(phaseRotRates) * phaseRotAmt);
 		hilbert = wet;
 		hilbert.collectInPlace({arg item, i;
 			item = (Hilbert.ar(item) * [newLFMod[i].cos, newLFMod[i].sin]).sum;
