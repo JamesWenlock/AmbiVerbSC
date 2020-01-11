@@ -67,11 +67,11 @@ WARNING::
 Size is a hardcoded parameter. It cannnot be modulated.
 ::
 
-argument:: timeModWidth
+argument:: modWidth
 
 Scales maximum amount allpass reverberator delay times modulated (1 = maximum modulation, 0 = no modulation).
 
-argument:: timeModRate
+argument:: modRate
 
 Rate at which allpass reverberators modulated (in hz).
 
@@ -125,7 +125,7 @@ AmbiVerbGUI(s);
 ::
 
 code::
-// Example for rendering AmbiVerSC with presets using CTK  
+// Example for rendering AmbiVerSC with presets using CTK
 (
 var score, synths, buffer, path, paramDict, preset, sampleRate, sampleFormat, headerFormat;
 score = CtkScore.new;

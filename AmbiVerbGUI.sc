@@ -48,7 +48,7 @@ AmbiVerbGUI {
 			preset  = AVPreset.new;
 			curPreset = "default";
 			params = preset.read(curPreset);
-			params.postln;
+			// params.postln;
 			bufNames = [];
 			buffers  = Dictionary.new;
 			curOutput = "Stereo";
@@ -61,8 +61,8 @@ AmbiVerbGUI {
 
 	// Updates AmbiverbSC parameters
 	setSynth {
-		"setting synth".postln;
-		params.postln;
+		// "setting synth".postln;
+		// params.postln;
 		(soundPlay.isPlaying).if({
 		soundPlay.set(
 				\amp, amp,
@@ -139,7 +139,7 @@ AmbiVerbGUI {
 				.font_(guiFont)
 			);
 			buttons[\play].action_({arg button;
-				button.value.postln;
+				// button.value.postln;
 				if (button.value == 1,
 					{this.start},
 					{this.stop}
@@ -154,7 +154,7 @@ AmbiVerbGUI {
 
 			bufPath.do({arg path;
 				var thisPath = path.fileName.split(separator: $.);
-				thisPath[1].postln;
+				// thisPath[1].postln;
 				if ((thisPath[1] == "wav") && (thisPath.size ==  2) ,
 					{
 						bufNames = bufNames.add(thisPath[0]);
@@ -162,7 +162,7 @@ AmbiVerbGUI {
 					}
 				)
 			});
-			buffers.postln;
+			// buffers.postln;
 			buffer = buffers[bufNames[0].asSymbol];
 
 			popUp = PopUpMenu(gui, Rect.new(255, 80, 125, 30)).items_(bufNames)
@@ -172,9 +172,9 @@ AmbiVerbGUI {
 
 			popUp.action_({arg obj;
 				buttons[\play].valueAction_(0);
-				obj.item.postln;
+				// obj.item.postln;
 				buffer = buffers[obj.item.asSymbol];
-				buffer.postln;
+				// buffer.postln;
 				this.initSynths;
 			});
 		};
@@ -189,10 +189,10 @@ AmbiVerbGUI {
 				.background_(Color.black);
 			);
 			buttons[\output].action_({arg button;
-				button.value.postln;
+				// button.value.postln;
 				buttons[\play].valueAction_(0);
 				curOutput = button.item;
-				curOutput.postln;
+				// curOutput.postln;
 				this.initSynths;
 			});
 		};
@@ -215,7 +215,7 @@ AmbiVerbGUI {
 			// Creates parameter knobs and links them to AmbiverbSC
 			data.do({arg thisData, i;
 				var knob, knobVal, thisText;
-				params[thisData[3]].postln;
+				// params[thisData[3]].postln;
 				knob = Knob(outView, 30@25).mode_(\vert).color_([Color.black, Color.green, Color.green, Color.green])
 				.action_({arg thisKnob;
 					if(((thisData[3] != \orient) && (thisData[3] != \size)),
@@ -232,8 +232,8 @@ AmbiVerbGUI {
 								{params.put(thisData[3], knobVal)}
 							);
 							this.setSynth;
-							thisData[0].postln;
-							thisData[1].postln;
+							// thisData[0].postln;
+							// thisData[1].postln;
 						},
 					);
 				}).valueAction_(
@@ -427,7 +427,7 @@ PopUpMenu(gui, Rect.new(842, 170, 35, 28)).font_(guiFont.pixelSize_(15))
 		SynthDef.new(\Stereo,
 			{arg amp = 1, buffer, mix = 0.7, preDelay = 0, crossoverFreq = 3000, lowRT = 8, highRT = 3, dispersion = 1, modWidth = 0.2, modRate =  0.2, coupRate= 0.2, coupAmt = 2pi, phaseRotRate = 0.23, phaseRotAmt = 2pi, phaseRotMix = 1, spread = 1, out;
 				var sig;
-				orient.postln;
+				// orient.postln;
 				sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer), loop: 1);
 				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), orient, 10,spread.lag(0.5));
 				sig = sig * amp.lag(0.5);
@@ -438,7 +438,7 @@ PopUpMenu(gui, Rect.new(842, 170, 35, 28)).font_(guiFont.pixelSize_(15))
 		SynthDef.new(\BFormat,
 			{arg amp = 1, buffer, mix = 0.7, preDelay = 0, crossoverFreq = 3000, lowRT = 8, highRT = 3, dispersion = 1, modWidth = 0.2, modRate =  0.2, coupRate= 0.2, coupAmt = 2pi, phaseRotRate = 0.23, phaseRotAmt = 2pi, phaseRotMix = 1, spread = 1, out;
 				var sig;
-				orient.postln;
+				// orient.postln;
 				sig = PlayBuf.ar(4, buffer, BufRateScale.kr(buffer), loop: 1);
 				sig = AmbiVerbSC.ar(sig, mix.lag(0.5), preDelay.lag(0.5), crossoverFreq.lag(0.5), lowRT.lag(0.5), highRT.lag(0.5), dispersion.lag(0.5), size, modWidth.lag(0.5), modRate.lag(0.5), coupRate.lag(0.5), coupAmt.lag(0.5), phaseRotRate.lag(0.5), phaseRotAmt.lag(0.5), orient, 10,spread.lag(0.5));
 				sig = sig * amp.lag(0.5);
@@ -450,7 +450,7 @@ PopUpMenu(gui, Rect.new(842, 170, 35, 28)).font_(guiFont.pixelSize_(15))
 
 	// Starts audio
 	start {
-		params.postln;
+		// params.postln;
 		soundPlay = Synth(curOutput.asSymbol,
 			[
 				\buffer, buffer, \amp, amp,
@@ -473,9 +473,9 @@ PopUpMenu(gui, Rect.new(842, 170, 35, 28)).font_(guiFont.pixelSize_(15))
 
 	// Stops audio
 	stop {
-		soundPlay.postln;
+		// soundPlay.postln;
 		(soundPlay.isPlaying).if({
-			"Stop".postln;
+			// "Stop".postln;
 			soundPlay.free;
 		});
 	}

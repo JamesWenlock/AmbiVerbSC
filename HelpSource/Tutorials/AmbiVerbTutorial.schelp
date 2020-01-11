@@ -41,7 +41,7 @@ This equation is used recursively to compute a large number of modal frequency e
 
 We can now plug these values into our reverberator formula to get the parameters needed for link::Classes/AllpassL ::.
 
-The final piece of the allpass puzzle is delay-line modulation. This simulates the imperfections of a room and blurs resonances making the tank sound more realistic. Modulation is acheived using individual link::Classes/LFDNoise3:: ugens for each allpass. The amount of modulation is controlled using a width argument with width corrisponding to a scaler of the smallest delay time in the cascade. The rate is universal for each allpass.
+The final piece of the allpass puzzle is delay-line modulation. This simulates the imperfections of a room and blurs resonances making the tank sound more realistic. Modulation is acheived using individual link::Classes/LFDNoise3:: ugens for each allpass. The amount of modulation is controlled using a width argument with width corresponding to a scaler of the smallest delay time in the cascade. The rate is universal for each allpass.
 
 subsection:: Feedback Loop
 
@@ -70,7 +70,7 @@ note::The majority of spatial manipulation of the signal is done using the Ambis
 
 subsection:: Going From B to A
 
-The signal is initially Decoded to A-format which outputs 4 signals corrisponding to the vertices a tetrahedran in space. One of the best ways to make something sound spatial is to transform each of these signals in a similar yet different fashion. In AmbiVerbSC, this is accomplished by calculating 4 different arrays of delay times based off of rooms with nearly identical dimensions. This corrisponds to 4 related monophonic reverberators which our A-format signal is sent through. With delay-time modulation, this creates a strong foundation for a rich spatial image.
+The signal is initially Decoded to A-format which outputs 4 signals corresponding to the vertices a tetrahedran in space. One of the best ways to make something sound spatial is to transform each of these signals in a similar yet different fashion. In AmbiVerbSC, this is accomplished by calculating 4 different arrays of delay times based off of rooms with nearly identical dimensions. This corrisponds to 4 related monophonic reverberators which our A-format signal is sent through. With delay-time modulation, this creates a strong foundation for a rich spatial image.
 
 SuperCollider makes this process easy with multichannel expansion. As long as the delay time arrays are manipulated properly, the A-format signal can be sent through the same code used for the monophonic reverb with no hiccups.
 
@@ -84,7 +84,7 @@ Once our A-format signal has been reverberated, delayed, and scaled, it is conve
 
 subsection:: Coupling
 
-Still in B-format, the signal is then coupled. Coupling mixes the signals in space using a matrix. This allows for varying degrees of the A-Format signal to pass through all of the reverberators rather than being fixed at a tetrahedral point. This mixing is implemented using the ATK's link::Classes/FoaRTT:: which is modulated with a series of link::Classes/LFNoise2::. This transformed signal is then converted back to A-format and sent again through the loop.
+Still in B-format, the signal is then coupled. Coupling mixes the signals in space using a matrix. This allows for varying degrees of the A-Format signal to pass through all of the reverberators rather than being fixed at a tetrahedral point. This mixing is implemented using the ATK's link::Classes/FoaRTT:: which is modulated with a series of link::Classes/LFDNoise3::. This transformed signal is then converted back to A-format and sent again through the loop.
 
 section:: AmbiVerbGUI
 
