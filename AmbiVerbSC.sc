@@ -120,7 +120,7 @@ AmbiVerbSC {
 		allPassData1.do({arg thisData;
 			var width = (thisData[0] * modWidth.linlin(0, 1, widthRange[0], widthRange[1])) * 0.5;
 			var maxDelay = thisData[0] * 2;
-			var delay = thisData[0] + (LFDNoise3.ar(modRate) * width);
+			var delay = thisData[0] + (LFDNoise3.kr(modRate) * width);
 			sum = AllpassL.ar(sum, maxDelay, delay,  thisData[1])
 		});
 /*
@@ -130,7 +130,7 @@ AmbiVerbSC {
 			allPassChunk[0].do({arg thisData;
 				var width = thisData[0] * modWidth.linlin(0, 1, widthRange[0], widthRange[1]) * 0.5;
 				var maxDelay = thisData[0] * 2;
-				var delay = thisData[0] + (LFDNoise3.ar(modRate)* width);
+				var delay = thisData[0] + (LFDNoise3.kr(modRate)* width);
 				sum = AllpassL.ar(sum, maxDelay, delay, thisData[1]);
 			});
 			chunkSum = sum;
@@ -153,11 +153,11 @@ AmbiVerbSC {
 		wet = FoaEncode.ar(wet, FoaEncoderMatrix.newAtoB);
 
 		// Applies coupling in B-format with RTT
-		coupMod = LFDNoise3.ar(coupRates) * coupAmt;
+		coupMod = LFDNoise3.kr(coupRates) * coupAmt;
 		wet = FoaRTT.ar(wet, coupMod[0], coupMod[1], coupMod[2]);
 
 		// Applies hilbert phase rotation
-		newLFMod = LFNoise2.ar(phaseRotRates) * phaseRotAmt;
+		newLFMod = LFDNoise3.kr(phaseRotRates) * phaseRotAmt;
 		hilbert = wet;
 		hilbert.collectInPlace({arg item, i;
 			item = (Hilbert.ar(item) * [newLFMod[i].cos, newLFMod[i].sin]).sum;
@@ -179,7 +179,7 @@ AmbiVerbSC {
 		allPassData2.do({arg thisData;
 			var width = (thisData[0] * modWidth.linlin(0, 1, widthRange[0], widthRange[1])) * 0.5;
 			var maxDelay = thisData[0] * 2;
-			var delay = thisData[0] + (LFDNoise3.ar(modRate) * width);
+			var delay = thisData[0] + (LFDNoise3.kr(modRate) * width);
 			sum = AllpassL.ar(sum, maxDelay, delay, thisData[1])
 		});
 
